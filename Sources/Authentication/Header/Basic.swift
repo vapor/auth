@@ -1,11 +1,7 @@
-import Turnstile
-import Foundation
 import Core
 
-@_exported import class Turnstile.APIKey
-
 extension Authorization {
-    public var basic: APIKey? {
+    public var basic: Credentials? {
         guard let range = header.range(of: "Basic ") else {
             return nil
         }
@@ -21,6 +17,6 @@ extension Authorization {
         let apiKeyID = decodedToken.substring(to: separatorRange.lowerBound)
         let apiKeySecret = decodedToken.substring(from: separatorRange.upperBound)
 
-        return APIKey(id: apiKeyID, secret: apiKeySecret)
+        return Credentials(username: apiKeyID, password: apiKeySecret)
     }
 }

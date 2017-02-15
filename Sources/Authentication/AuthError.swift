@@ -1,4 +1,4 @@
-public enum AuthError: Swift.Error {
+public enum AuthenticationError: Swift.Error {
     case noSubject
     case invalidAccountType
     case invalidBasicAuthorization

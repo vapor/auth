@@ -7,9 +7,6 @@ let package = Package(
         Target(name: "Authorization", dependencies: ["Authentication"]),
     ],
     dependencies: [
-        // A security framework for Swift.
-        .Package(url: "https://github.com/stormpath/Turnstile.git", majorVersion: 1),
-
         // Swift models, relationships, and querying for NoSQL and SQL databases.
         .Package(url: "https://github.com/vapor/fluent.git", Version(2,0,0, prereleaseIdentifiers: ["alpha"]))
     ]

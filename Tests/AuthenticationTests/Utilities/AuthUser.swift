@@ -30,13 +30,4 @@ final class AuthUser: User {
     static func revert(_ database: Database) throws {
         
     }
-    
-    static func authenticate(credentials: Credentials) throws -> Authentication.User {
-        return AuthUser(name: "test")
-    }
-    
-    
-    static func register(credentials: Credentials) throws -> Authentication.User {
-        fatalError("\(#function) not supported")
-    }
 }
