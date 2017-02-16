@@ -1,7 +1,7 @@
 import Core
 
 extension Authorization {
-    public var basic: Credentials? {
+    public var basic: Password? {
         guard let range = header.range(of: "Basic ") else {
             return nil
         }
@@ -17,6 +17,6 @@ extension Authorization {
         let apiKeyID = decodedToken.substring(to: separatorRange.lowerBound)
         let apiKeySecret = decodedToken.substring(from: separatorRange.upperBound)
 
-        return Credentials(username: apiKeyID, password: apiKeySecret)
+        return Password(username: apiKeyID, password: apiKeySecret)
     }
 }

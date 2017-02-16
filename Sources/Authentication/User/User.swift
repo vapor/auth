@@ -1,3 +1,3 @@
 import Fluent
 
-public protocol User: Entity, Authenticatable {}
+// public protocol User: Entity {}

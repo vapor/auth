@@ -1,25 +1,55 @@
-public struct Token {
-    public let token: String
+// MARK: Data structure
 
-    public init(token: String) {
-        self.token = token
+public struct Token: Crendentials {
+    public let string: String
+
+    public init(string: String) {
+        self.string = string
     }
 }
 
-extension User {
+// MARK: Authenticatable
+
+public protocol TokenAuthenticatable: Authenticatable {
+    /// The token entity that contains a foreign key
+    /// pointer to the user table
+    associatedtype TokenType: TokenProtocol
+
+    /// Returns the user matching the supplied token.
+    static func authenticate(_: Token) throws -> Self
+}
+
+public protocol TokenProtocol {
+    static var tokenKey: String { get }
+    static func findUser<U: Entity>(for: Token) throws -> U
+}
+
+extension TokenProtocol {
+    public static var tokenKey: String {
+        return "token"
+    }
+}
+
+// MARK: Entity conformance
+
+import Fluent
+
+extension TokenAuthenticatable where Self: Entity {
     public static func authenticate(_ token: Token) throws -> Self {
-        //        guard let tokenType = tokenType else {
-        //            throw AuthError.unsupportedCredentials
-        //        }
+        return try TokenType.findUser(for: token)
+    }
+}
 
-        //            guard let user = try Self.query()
-        //                .union(tokenType)
-        //                .filter(tokenType, tokenType.tokenKey, token)
-        //                .first()
-        //            else {
-        //                throw AuthError.unsupportedCredentials
-        //            }
+extension TokenProtocol where Self: Entity {
+    public static func findUser<U: Entity>(for token: Token) throws -> U {
+        guard let user = try U.query()
+            .join(self)
+            .filter(self, tokenKey, token.string)
+            .first()
+        else {
+            throw AuthenticationError.invalidCredentials
+        }
 
-        throw AuthenticationError.unsupportedCredentials
+        return user
     }
 }
