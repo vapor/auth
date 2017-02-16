@@ -20,8 +20,10 @@ public protocol PasswordAuthenticatable: Authenticatable {
     /// username and password
     static func authenticate(_: Password) throws -> Self
 
-    /// The entity's raw or hashed password
-    var password: String? { get }
+    /// The entity's hashed password used for
+    /// validating against Password credentials
+    /// with a PasswordVerifier
+    var hashedPassword: String? { get }
 
     /// The key under which the user's username,
     /// email, or other identifing value is stored.
@@ -32,8 +34,22 @@ public protocol PasswordAuthenticatable: Authenticatable {
     static var passwordKey: String { get }
 }
 
+extension PasswordAuthenticatable {
+    public static var usernameKey: String {
+        return "email"
+    }
+
+    public static var passwordKey: String {
+        return "password"
+    }
+
+    public var hashedPassword: String? {
+        return nil
+    }
+}
+
 public protocol PasswordVerifier {
-    func verify(password: String, matchesPassword: String) throws -> Bool
+    func verify(password: String, matchesHash: String) throws -> Bool
 }
 
 // MARK: Entity conformance
@@ -53,14 +69,14 @@ extension PasswordAuthenticatable where Self: Entity {
                     throw AuthenticationError.invalidCredentials
             }
 
-            guard let matchPassword = match.password else {
+            guard let hash = match.hashedPassword else {
                 throw AuthenticationError.invalidCredentials
             }
 
             guard try verifier.verify(
                 password: creds.password,
-                matchesPassword: matchPassword
-                ) else {
+                matchesHash: hash
+            ) else {
                     throw AuthenticationError.invalidCredentials
             }
 
