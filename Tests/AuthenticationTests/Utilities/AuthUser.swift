@@ -31,22 +31,10 @@ final class AuthUser: Entity {
     }
 }
 
-extension AuthUser: IdentifierAuthenticatable {
-    static func authenticate(_ id: Identifier) throws -> Self {
-        return self.init(name: "5")
-    }
-}
-
 extension AuthUser: TokenAuthenticatable {
     typealias TokenType = AuthUser
 
     static func authenticate(_ id: Token) throws -> Self {
         return self.init(name: "6")
-    }
-}
-
-extension AuthUser: TokenProtocol {
-    static var tokenKey: String {
-        return ""
     }
 }

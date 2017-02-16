@@ -10,12 +10,7 @@ class ExampleTests: XCTestCase {
 
     func testExample() throws {
         do {
-            let id = Identifier(id: Node.string("5"))
             let token = Token(string: "5")
-
-            let user1 = try AuthUser.authenticate(id)
-            XCTAssertEqual(user1.name, "5")
-
             let user2 = try AuthUser.authenticate(token)
             XCTAssertEqual(user2.name, "6")
         } catch {

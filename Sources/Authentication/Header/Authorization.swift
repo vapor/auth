@@ -1,7 +1,7 @@
-public struct Authorization {
-    public let header: String
+public struct AuthorizationHeader {
+    public let string: String
 
-    public init(header: String) {
-        self.header = header
+    public init(string: String) {
+        self.string = string
     }
 }

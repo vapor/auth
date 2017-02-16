@@ -12,19 +12,17 @@ public struct Token: Crendentials {
 
 public protocol TokenAuthenticatable: Authenticatable {
     /// The token entity that contains a foreign key
-    /// pointer to the user table
-    associatedtype TokenType: TokenProtocol
+    /// pointer to the user table (or on the user table itself)
+    associatedtype TokenType
 
     /// Returns the user matching the supplied token.
-    static func authenticate(_: Token) throws -> Self
-}
+    static func authenticate(_ token: Token) throws -> Self
 
-public protocol TokenProtocol {
+    /// The column under which the tokens are stored
     static var tokenKey: String { get }
-    static func findUser<U: Entity>(for: Token) throws -> U
 }
 
-extension TokenProtocol {
+extension TokenAuthenticatable {
     public static var tokenKey: String {
         return "token"
     }
@@ -34,20 +32,27 @@ extension TokenProtocol {
 
 import Fluent
 
-extension TokenAuthenticatable where Self: Entity {
+extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity {
     public static func authenticate(_ token: Token) throws -> Self {
-        return try TokenType.findUser(for: token)
+        guard let user = try Self.query()
+            .join(Self.TokenType.self)
+            .filter(Self.TokenType.self, tokenKey, token.string)
+            .first()
+        else {
+                throw AuthenticationError.invalidCredentials
+        }
+
+        return user
     }
 }
 
-extension TokenProtocol where Self: Entity {
-    public static func findUser<U: Entity>(for token: Token) throws -> U {
-        guard let user = try U.query()
-            .join(self)
-            .filter(self, tokenKey, token.string)
+extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity, Self.TokenType == Self {
+    public static func authenticate(_ token: Token) throws -> Self {
+        guard let user = try Self.query()
+            .filter(tokenKey, token.string)
             .first()
         else {
-            throw AuthenticationError.invalidCredentials
+                throw AuthenticationError.invalidCredentials
         }
 
         return user
