@@ -1,8 +1,8 @@
 import Fluent
 
-public protocol Authorizable: Entity {
+public protocol Authorizable: Entity {}
 
-}
+// MARK: Pivot
 
 extension Authorizable {
     public func isAuthorized<
@@ -35,11 +35,34 @@ extension Authorizable {
             PivotType.Left == Self,
             PivotType.Right == PermissionType
     {
-            guard try isAuthorized(to: permission, withPivot: PivotType.self) else {
-                throw AuthorizationError.notAuthorized
-            }
+        guard try isAuthorized(to: permission, withPivot: PivotType.self) else {
+            throw AuthorizationError.notAuthorized
+        }
     }
 }
+
+extension PivotProtocol where Self.Right: Permission {
+    static func add(_ permissions: [Self.Right], to left: Self.Left) throws {
+        for permission in permissions {
+            try add(permission, to: left)
+        }
+    }
+    
+    static func add(_ permission: Self.Right, to left: Self.Left) throws {
+        guard let permission = try Self.Right
+            .query()
+            .filter("key", permission.key)
+            .first()
+        else {
+            throw AuthorizationError.unknownPermission
+        }
+        
+        try self.attach(left, permission)
+    }
+}
+
+
+// MARK: Double Pivot
 
 extension Authorizable {
     public func isAuthorized<

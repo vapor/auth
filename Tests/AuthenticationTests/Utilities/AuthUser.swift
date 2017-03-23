@@ -3,31 +3,21 @@ import Node
 import Fluent
 
 final class AuthUser: Entity {
-    var id: Node?
     var name: String
-    var exists: Bool = false
+    let storage = Storage()
     
     init(name: String) {
         self.name = name
     }
     
-    init(node: Node, in context: Context) throws {
-        self.id = nil
-        self.name = try node.extract("name")
+    init(row: Row) throws {
+        name = try row.get("name")
     }
-    
-    func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
-            "id": id,
-            "name": name
-        ])
-    }
-    
-    static func prepare(_ database: Database) throws {
-    }
-    
-    static func revert(_ database: Database) throws {
-        
+
+    func makeRow() throws -> Row {
+        var row = Row()
+        try row.set("name", name)
+        return row
     }
 }
 

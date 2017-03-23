@@ -8,7 +8,7 @@ extension AuthorizationHeader {
 
         let token = string.substring(from: range.upperBound)
 
-        let decodedToken = token.makeBytes().base64Decoded.string
+        let decodedToken = token.makeBytes().base64Decoded.makeString()
         guard let separatorRange = decodedToken.range(of: ":") else {
             return nil
         }
