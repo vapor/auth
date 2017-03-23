@@ -42,13 +42,13 @@ extension Authorizable {
 }
 
 extension PivotProtocol where Self.Right: Permission {
-    static func add(_ permissions: [Self.Right], to left: Self.Left) throws {
+    public static func add(_ permissions: [Self.Right], to left: Self.Left) throws {
         for permission in permissions {
             try add(permission, to: left)
         }
     }
     
-    static func add(_ permission: Self.Right, to left: Self.Left) throws {
+    public static func add(_ permission: Self.Right, to left: Self.Left) throws {
         guard let permission = try Self.Right
             .query()
             .filter("key", permission.key)
