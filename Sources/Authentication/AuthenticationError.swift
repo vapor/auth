@@ -1,4 +1,6 @@
-public enum AuthenticationError: Swift.Error {
+import Debugging
+
+public enum AuthenticationError: Error {
     case invalidBasicAuthorization
     case invalidBearerAuthorization
     case noAuthorizationHeader
@@ -8,8 +10,8 @@ public enum AuthenticationError: Swift.Error {
     case unspecified(Error)
 }
 
-extension AuthenticationError: CustomStringConvertible {
-    public var description: String {
+extension AuthenticationError: Debuggable {
+    public var reason: String {
         let reason: String
 
         switch self {
@@ -30,6 +32,33 @@ extension AuthenticationError: CustomStringConvertible {
         }
 
         return "Authentication error: \(reason)"
+    }
+    
+    public var identifier: String {
+        switch self {
+        case .invalidBasicAuthorization:
+            return "invalidBasicAuthorization"
+        case .invalidBearerAuthorization:
+            return "invalidBearerAuthorization"
+        case .noAuthorizationHeader:
+            return "noAuthorizationHeader"
+        case .notAuthenticated:
+            return "notAuthenticated"
+        case .invalidCredentials:
+            return "invalidCredentials"
+        case .unsupportedCredentials:
+            return "unsupportedCredentials"
+        case .unspecified(let error):
+            return "unspecified (\(error))"
+        }
+    }
+    
+    public var suggestedFixes: [String] {
+        return []
+    }
+    
+    public var possibleCauses: [String] {
+        return []
     }
 }
 
