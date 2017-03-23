@@ -36,6 +36,10 @@ extension PasswordAuthenticatable {
     public var hashedPassword: String? {
         return nil
     }
+    
+    public static var passwordVerifier: PasswordVerifier? {
+        return nil
+    }
 }
 
 
