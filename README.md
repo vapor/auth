@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://cloud.githubusercontent.com/assets/1342803/24704008/10d9e7de-1a06-11e7-855b-af4a079ba6b5.png" width="320" alt="Auth">
+    <img src="https://cloud.githubusercontent.com/assets/1342803/24793053/ca0a2b80-1b80-11e7-8466-830c9ded1903.png" width="320" alt="Auth">
     <br>
     <br>
     <a href="http://beta.docs.vapor.codes/auth/package/">
