@@ -22,7 +22,7 @@ import Fluent
 
 extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity {
     public static func authenticate(_ token: Token) throws -> Self {
-        guard let user = try Self.query()
+        guard let user = try Self.makeQuery()
             .join(Self.TokenType.self)
             .filter(Self.TokenType.self, tokenKey, token.string)
             .first()
@@ -36,7 +36,7 @@ extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity {
 
 extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity, Self.TokenType == Self {
     public static func authenticate(_ token: Token) throws -> Self {
-        guard let user = try Self.query()
+        guard let user = try Self.makeQuery()
             .filter(tokenKey, token.string)
             .first()
             else {

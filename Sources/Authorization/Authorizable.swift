@@ -16,7 +16,7 @@ extension Authorizable {
             PivotType.Left == Self,
             PivotType.Right == PermissionType
     {
-        guard let permission = try PermissionType.query().filter("key", permission.key).first() else {
+        guard let permission = try PermissionType.makeQuery().filter("key", permission.key).first() else {
             throw AuthorizationError.unknownPermission
         }
 
@@ -50,7 +50,7 @@ extension PivotProtocol where Self.Right: Permission {
     
     public static func add(_ permission: Self.Right, to left: Self.Left) throws {
         guard let permission = try Self.Right
-            .query()
+            .makeQuery()
             .filter("key", permission.key)
             .first()
         else {
@@ -80,7 +80,7 @@ extension Authorizable {
             PivotType.Left.Right == MiddleType,
             PivotType.Right == PermissionType
     {
-        guard let permission = try PermissionType.query().filter("key", permission.key).first() else {
+        guard let permission = try PermissionType.makeQuery().filter("key", permission.key).first() else {
             throw AuthorizationError.unknownPermission
         }
 
