@@ -57,7 +57,7 @@ extension PasswordAuthenticatable where Self: Entity {
         
         if let verifier = passwordVerifier {
             guard let match = try Self
-                .query()
+                .makeQuery()
                 .filter(usernameKey, creds.username)
                 .first()
                 else {
@@ -78,7 +78,7 @@ extension PasswordAuthenticatable where Self: Entity {
             user = match
         } else {
             guard let match = try Self
-                .query()
+                .makeQuery()
                 .filter(usernameKey, creds.username)
                 .filter(passwordKey, creds.password)
                 .first()
