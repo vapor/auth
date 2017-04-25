@@ -44,7 +44,7 @@ extension PasswordAuthenticatable {
 
 
 public protocol PasswordVerifier {
-    func verify(password: String, matchesHash: String) throws -> Bool
+    func verify(password: String, matches hash: String) throws -> Bool
 }
 
 // MARK: Entity conformance
@@ -70,7 +70,7 @@ extension PasswordAuthenticatable where Self: Entity {
             
             guard try verifier.verify(
                 password: creds.password,
-                matchesHash: hash
+                matches: hash
                 ) else {
                     throw AuthenticationError.invalidCredentials
             }
