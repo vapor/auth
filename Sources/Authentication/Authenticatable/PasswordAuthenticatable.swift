@@ -1,3 +1,5 @@
+import Bits
+
 public protocol PasswordAuthenticatable: Authenticatable {
     // MARK:  Username / Password
     /// Return the user matching the supplied
@@ -44,7 +46,15 @@ extension PasswordAuthenticatable {
 
 
 public protocol PasswordVerifier {
-    func verify(password: String, matchesHash: String) throws -> Bool
+    func verify(password: Bytes, matches hash: Bytes) throws -> Bool
+}
+
+extension PasswordVerifier {
+    public func verify(password: BytesConvertible, matches hash: BytesConvertible) throws -> Bool {
+        let password = try password.makeBytes()
+        let hash = try hash.makeBytes()
+        return try verify(password: password, matches: hash)
+    }
 }
 
 // MARK: Entity conformance
@@ -69,8 +79,8 @@ extension PasswordAuthenticatable where Self: Entity {
             }
             
             guard try verifier.verify(
-                password: creds.password,
-                matchesHash: hash
+                password: creds.password.makeBytes(),
+                matches: hash.makeBytes()
                 ) else {
                     throw AuthenticationError.invalidCredentials
             }
