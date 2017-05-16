@@ -1,1 +1,1 @@
-public protocol Crendentials { }
+public protocol Credentials { }

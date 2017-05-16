@@ -1,6 +1,6 @@
 // MARK: Data structure
 
-public struct Password: Crendentials {
+public struct Password: Credentials {
     public let username: String
     public let password: String
 
