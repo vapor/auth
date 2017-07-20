@@ -7,4 +7,8 @@ extension AuthorizationHeader {
         let token = string.substring(from: range.upperBound)
         return Token(string: token)
     }
+
+    public init(bearer: Token) {
+        self.init(string: "Bearer \(bearer.string)")
+    }
 }

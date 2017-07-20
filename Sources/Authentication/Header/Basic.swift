@@ -1,5 +1,3 @@
-import Core
-
 extension AuthorizationHeader {
     public var basic: Password? {
         guard let range = string.range(of: "Basic ") else {
@@ -17,5 +15,11 @@ extension AuthorizationHeader {
         let password = decodedToken.substring(from: separatorRange.upperBound)
 
         return Password(username: username, password: password)
+    }
+
+    public init(basic: Password) {
+        let credentials = "\(basic.username):\(basic.password)"
+        let encoded = credentials.makeBytes().base64Encoded.makeString()
+        self.init(string: "Basic \(encoded)")
     }
 }
