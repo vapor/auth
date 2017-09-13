@@ -67,7 +67,7 @@ extension PivotProtocol where Self.Right: Permission {
 extension Authorizable {
     public func isAuthorized<
         PermissionType: Permission,
-        MiddleType: Entity,
+        MiddleType,
         PivotType: PivotProtocol & Entity
     >(
         to permission: PermissionType,
@@ -89,7 +89,7 @@ extension Authorizable {
 
     public func assertAuthorization<
         PermissionType: Permission,
-        MiddleType: Entity,
+        MiddleType,
         PivotType: PivotProtocol & Entity
     >(
         to permission: PermissionType,
