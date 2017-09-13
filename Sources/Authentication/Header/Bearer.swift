@@ -4,8 +4,13 @@ extension AuthorizationHeader {
             return nil
         }
 
-        let token = string[range.upperBound...]
-        return Token(string: String(token))
+        #if swift(>=4)
+            let token = string[range.upperBound...]
+            return Token(string: String(token))
+        #else
+            let token = string.substring(from: range.upperBound)
+            return Token(string: token)
+        #endif
     }
 
     public init(bearer: Token) {
