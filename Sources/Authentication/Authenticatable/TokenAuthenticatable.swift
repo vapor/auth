@@ -34,7 +34,7 @@ extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity {
     }
 }
 
-extension TokenAuthenticatable where Self: Entity, Self.TokenType: Entity, Self.TokenType == Self {
+extension TokenAuthenticatable where Self: Entity, Self.TokenType == Self {
     public static func authenticate(_ token: Token) throws -> Self {
         guard let user = try Self.makeQuery()
             .filter(tokenKey, token.string)
