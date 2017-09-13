@@ -4,17 +4,17 @@ extension AuthorizationHeader {
             return nil
         }
 
-        let token = string.substring(from: range.upperBound)
+        let token = string[range.upperBound...]
 
-        let decodedToken = token.makeBytes().base64Decoded.makeString()
+        let decodedToken = String(token).makeBytes().base64Decoded.makeString()
         guard let separatorRange = decodedToken.range(of: ":") else {
             return nil
         }
 
-        let username = decodedToken.substring(to: separatorRange.lowerBound)
-        let password = decodedToken.substring(from: separatorRange.upperBound)
+        let username = decodedToken[...separatorRange.lowerBound]
+        let password = decodedToken[separatorRange.upperBound...]
 
-        return Password(username: username, password: password)
+        return Password(username: String(username), password: String(password))
     }
 
     public init(basic: Password) {

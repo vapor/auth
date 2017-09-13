@@ -4,8 +4,8 @@ extension AuthorizationHeader {
             return nil
         }
 
-        let token = string.substring(from: range.upperBound)
-        return Token(string: token)
+        let token = string[range.upperBound...]
+        return Token(string: String(token))
     }
 
     public init(bearer: Token) {
