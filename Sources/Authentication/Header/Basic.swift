@@ -12,7 +12,7 @@ extension AuthorizationHeader {
                 return nil
             }
 
-            let username = decodedToken[...separatorRange.lowerBound]
+            let username = decodedToken[..<separatorRange.lowerBound]
             let password = decodedToken[separatorRange.upperBound...]
 
             return Password(username: String(username), password: String(password))
