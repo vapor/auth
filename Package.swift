@@ -12,6 +12,12 @@ let package = Package(
 
         // Core extensions, type-aliases, and functions that facilitate common tasks.
         .package(url: "https://github.com/vapor/core.git", .branch("beta")),
+        
+        // Cryptography modules
+        .package(url: "https://github.com/vapor/crypto.git", .branch("beta")),
+
+        // Non-blocking networking for Swift (HTTP and WebSockets).
+        .package(url: "https://github.com/vapor/engine.git", .branch("beta")),
 
         // Swift ORM (queries, models, and relations) for NoSQL and SQL databases.
         .package(url: "https://github.com/vapor/fluent.git", .branch("beta")),
