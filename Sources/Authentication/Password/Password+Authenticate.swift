@@ -1,13 +1,14 @@
 import Async
 import Fluent
 
-extension PasswordAuthenticatable {
+extension PasswordAuthenticatable where Database: QuerySupporting {
     /// Authenticates using the supplied credentials, connection, and verifier.
     public static func authenticate(
         using password: Password,
         verifier: PasswordVerifier,
         on connection: DatabaseConnectable
     ) throws -> Future<Self> {
+        
         return try Self
             .query(on: connection)
             .filter(usernameKey == password.username)

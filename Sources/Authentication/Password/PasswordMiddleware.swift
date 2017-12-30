@@ -5,7 +5,7 @@ import Vapor
 /// instance to pass through.
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
 public final class PasswordAuthenticationMiddleware<A>: Middleware
-    where A: PasswordAuthenticatable
+    where A: PasswordAuthenticatable, A.Database: QuerySupporting
 {
     /// the required password verifier
     public let verifier: PasswordVerifier

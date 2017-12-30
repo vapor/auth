@@ -24,8 +24,8 @@ final class User: Model, Migration, PasswordAuthenticatable {
         self.password = password
     }
 
-    static func prepare(on connection: SQLiteDatabase.Connection) -> Future<Void> {
-        return connection.create(self) { table in
+    static func prepare(on connection: SQLiteConnection) -> Future<Void> {
+        return SQLiteDatabase.create(self, on: connection) { table in
             try table.field(for: \.id)
             try table.field(for: \.name)
             try table.field(for: \.email)
@@ -33,7 +33,7 @@ final class User: Model, Migration, PasswordAuthenticatable {
         }
     }
 
-    static func revert(on connection: SQLiteDatabase.Connection) -> Future<Void> {
-        return connection.delete(self)
+    static func revert(on connection: SQLiteConnection) -> Future<Void> {
+        return SQLiteDatabase.delete(self, on: connection)
     }
 }
