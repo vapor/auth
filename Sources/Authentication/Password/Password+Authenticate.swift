@@ -7,29 +7,22 @@ extension PasswordAuthenticatable where Database: QuerySupporting {
         using password: Password,
         verifier: PasswordVerifier,
         on connection: DatabaseConnectable
-    ) throws -> Future<Self> {
-        
-        return try Self
+    ) -> Future<Self?> {
+        return try! Self
             .query(on: connection)
             .filter(usernameKey == password.username)
             .first()
-            .map(to: Self.self)
+            .map(to: Self?.self)
         { user in
             guard let user = user else {
-                throw AuthenticationError(
-                    identifier: "invalidCredentials",
-                    reason: "No \(Self.self) with matching credentials was found"
-                )
+                return nil
             }
 
             guard try verifier.verify(
                 password: password.password,
                 matches: user.authPassword
             ) else {
-                throw AuthenticationError(
-                    identifier: "invalidCredentials",
-                    reason: "No \(Self.self) with matching credentials was found"
-                )
+                return nil
             }
 
             return user

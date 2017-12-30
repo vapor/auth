@@ -41,11 +41,15 @@ public final class PasswordAuthenticationMiddleware<A>: Middleware
         // get database connection
         return req.connect(to: database).flatMap(to: Response.self) { conn in
             // auth user on connection
-            return try A.authenticate(
+            return A.authenticate(
                 using: password,
                 verifier: self.verifier,
                 on: conn
             ).flatMap(to: Response.self) { a in
+                guard let a = a else {
+                    throw Abort(.unauthorized, reason: "Invalid credentials")
+                }
+                
                 // set authed on request
                 try req.authenticate(a)
                 return try next.respond(to: req)

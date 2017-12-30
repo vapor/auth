@@ -17,7 +17,7 @@ class AuthenticationTests: XCTestCase {
 
         let password = Password(username: "tanner@vapor.codes", password: "foo")
         let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).blockingAwait()
-        XCTAssertEqual(authed.id, user.id)
+        XCTAssertEqual(authed?.id, user.id)
     }
 
     func testApplication() throws {
