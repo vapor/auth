@@ -30,7 +30,7 @@ public final class BearerAuthenticationMiddleware<A>: Middleware
         guard let token = req.http.headers.bearerAuthorization else {
             throw AuthenticationError(
                 identifier: "invalidCredentials",
-                reason: "Basic authorization header required."
+                reason: "Bearer authorization header required."
             )
         }
 
