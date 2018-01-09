@@ -6,16 +6,32 @@ import Vapor
 public protocol TokenAuthenticatable: Authenticatable {
     /// The associated token type.
     associatedtype TokenType: Token
-        where TokenType.User == Self
-
-    var tokens: Children<Self, TokenType> { get }
+        where TokenType.UserType == Self
 }
 
+/// A token, related to a user, capable of being used with Bearer auth.
+/// See `TokenAuthenticatable`.
 public protocol Token: BearerAuthenticatable {
-    associatedtype User: Model
-        where User.Database == Database
+    /// The User type that owns this token.
+    associatedtype UserType: Model
+        where UserType.Database == Database
 
-    var user: Parent<Self, User> { get }
+    /// A relation to the user that owns this token.
+    static var userIDKey: ReferenceWritableKeyPath<Self, UserType.ID> { get }
+}
+
+extension TokenAuthenticatable {
+    /// A relation to this user's tokens.
+    public var authTokens: Children<Self, TokenType> {
+        return children(TokenType.userIDKey)
+    }
+}
+
+extension Token {
+    /// A relation to this token's owner.
+    public var authUser: Parent<Self, UserType> {
+        return parent(Self.userIDKey)
+    }
 }
 
 /// Protects a route group, requiring a password authenticatable
@@ -37,7 +53,7 @@ public final class TokenAuthenticationMiddleware<A>: Middleware
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         let responder = BasicResponder { req in
             let token = try req.requireAuthenticated(A.TokenType.self)
-            return token.user.get(on: req).flatMap(to: Response.self) { user in
+            return token.authUser.get(on: req).flatMap(to: Response.self) { user in
                 try req.authenticate(user)
                 return try next.respond(to: req)
             }
