@@ -4,7 +4,7 @@ import Vapor
 /// using the request container as a singleton. Authenticated
 /// objects can then be stored here by middleware and fetched
 /// later in route closures.
-final class AuthenticationCache {
+final class AuthenticationCache: Service {
     /// The internal storage.
     private var storage: [ObjectIdentifier: Any]
 

@@ -29,15 +29,17 @@ class AuthenticationTests: XCTestCase {
         let sqlite = SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
-        services.use(databases)
+        services.register(databases)
 
         var migrations = MigrationConfig()
         migrations.add(model: User.self, database: .test)
-        services.use(migrations)
+        services.register(migrations)
 
         let app = try Application(services: services)
 
-        let conn = try app.makeConnection(to: .test).blockingAwait()
+        let conn = try app.requestConnection(to: .test).blockingAwait()
+        defer { app.releaseConnection(conn, to: .test) }
+
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         try user.save(on: conn).blockingAwait()
 
@@ -70,19 +72,21 @@ class AuthenticationTests: XCTestCase {
         let sqlite = SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
-        services.use(databases)
+        services.register(databases)
 
         var migrations = MigrationConfig()
         migrations.add(model: User.self, database: .test)
-        services.use(migrations)
+        services.register(migrations)
 
         var middleware = MiddlewareConfig.default()
         middleware.use(SessionsMiddleware.self)
-        services.use(middleware)
+        services.register(middleware)
 
         let app = try Application(services: services)
 
-        let conn = try app.makeConnection(to: .test).blockingAwait()
+        let conn = try app.requestConnection(to: .test).blockingAwait()
+        defer { app.releaseConnection(conn, to: .test) }
+
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         try user.save(on: conn).blockingAwait()
 

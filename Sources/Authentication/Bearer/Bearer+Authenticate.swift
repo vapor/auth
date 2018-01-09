@@ -13,4 +13,3 @@ extension BearerAuthenticatable where Database: QuerySupporting {
             .first()
     }
 }
-

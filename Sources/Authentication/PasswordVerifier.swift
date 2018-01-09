@@ -1,4 +1,5 @@
 import Foundation
+import Service
 
 /// Capable of verifying that a supplied password matches a hash.
 public protocol PasswordVerifier {
@@ -8,7 +9,7 @@ public protocol PasswordVerifier {
 
 /// Simply compares the password to the hash.
 /// Don't use this in production.
-public struct PlaintextVerifier: PasswordVerifier {
+public struct PlaintextVerifier: PasswordVerifier, Service {
     /// Create a new plaintext verifier.
     public init() {}
 

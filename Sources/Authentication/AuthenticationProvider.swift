@@ -14,6 +14,9 @@ public final class AuthenticationProvider: Provider {
         services.register(PasswordVerifier.self) { container in
             return BCryptVerifier()
         }
+        services.register(PasswordVerifier.self) { container in
+            return PlaintextVerifier()
+        }
         services.register(isSingleton: true) { container in
             return AuthenticationCache()
         }
@@ -26,7 +29,7 @@ public final class AuthenticationProvider: Provider {
 
 
 /// A struct password verifier around bcrypt
-public final class BCryptVerifier: PasswordVerifier {
+public final class BCryptVerifier: PasswordVerifier, Service {
     /// Create a new bcrypt verifier
     public init() {}
 

@@ -29,4 +29,3 @@ extension BasicAuthenticatable where Database: QuerySupporting {
         }
     }
 }
-
