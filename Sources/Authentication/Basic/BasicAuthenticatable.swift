@@ -2,8 +2,8 @@ import Async
 import Bits
 import Fluent
 
-/// Authenticatable by Basic username:password auth.
-public protocol PasswordAuthenticatable: Authenticatable {
+/// Authenticatable by `Basic username:password` auth.
+public protocol BasicAuthenticatable: Authenticatable {
     /// Key path to the username
     typealias UsernameKey = ReferenceWritableKeyPath<Self, String>
 
@@ -19,15 +19,15 @@ public protocol PasswordAuthenticatable: Authenticatable {
     static var passwordKey: PasswordKey { get }
 }
 
-extension PasswordAuthenticatable {
+extension BasicAuthenticatable {
     /// Accesses the model's password
-    public var authPassword: String {
+    public var basicPassword: String {
         get { return self[keyPath: Self.passwordKey] }
         set { self[keyPath: Self.passwordKey] = newValue }
     }
 
     /// Accesses the model's username
-    public var authUsername: String {
+    public var basicUsername: String {
         get { return self[keyPath: Self.usernameKey] }
         set { self[keyPath: Self.usernameKey] = newValue }
     }

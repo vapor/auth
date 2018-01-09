@@ -1,5 +1,5 @@
 /// A basic username and password.
-public struct Password {
+public struct BasicAuthorization {
     /// The username, sometimes an email address
     public let username: String
 
