@@ -26,8 +26,7 @@ class AuthenticationTests: XCTestCase {
         try services.register(SQLiteProvider())
         try services.register(AuthenticationProvider())
 
-        let sqlite = SQLiteDatabase(storage: .file(path: "/tmp/auth.sqlite"))
-
+        let sqlite = SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
         services.use(databases)
@@ -68,7 +67,7 @@ class AuthenticationTests: XCTestCase {
         try services.register(SQLiteProvider())
         try services.register(AuthenticationProvider())
 
-        let sqlite = SQLiteDatabase(storage: .file(path: "/tmp/auth.sqlite"))
+        let sqlite = SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
         services.use(databases)
