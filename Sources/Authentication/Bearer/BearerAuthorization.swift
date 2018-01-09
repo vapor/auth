@@ -1,4 +1,4 @@
-/// A basic username and password.
+/// A bearer token.
 public struct BearerAuthorization {
     /// The plaintext token
     public let token: String

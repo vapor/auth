@@ -3,7 +3,7 @@ import Crypto
 import HTTP
 
 extension HTTPHeaders {
-    /// Access or set the `Authorization: Basic: ...` header.
+    /// Access or set the `Authorization: Bearer: ...` header.
     public var bearerAuthorization: BearerAuthorization? {
         get {
             guard let string = self[.authorization] else {

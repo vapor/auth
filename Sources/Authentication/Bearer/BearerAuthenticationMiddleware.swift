@@ -11,7 +11,7 @@ public final class BearerAuthenticationMiddleware<A>: Middleware
     /// The database identifier
     public let database: DatabaseIdentifier<A.Database>
 
-    /// create a new password auth middleware
+    /// Creates a new `BearerAuthenticationMiddleware`.
     public init(
         _ type: A.Type = A.self,
         database: DatabaseIdentifier<A.Database>

@@ -4,11 +4,10 @@ import Fluent
 
 /// Authenticatable by `Bearer token` auth.
 public protocol BearerAuthenticatable: Authenticatable {
-    /// Key path to the tokeen
+    /// Key path to the token
     typealias TokenKey = ReferenceWritableKeyPath<Self, String>
 
-    /// The key under which the user's username,
-    /// email, or other identifing value is stored.
+    /// The key under which the model's unique token is stored.
     static var tokenKey: TokenKey { get }
 }
 

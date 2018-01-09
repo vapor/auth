@@ -2,7 +2,7 @@ import Async
 import Fluent
 
 extension BearerAuthenticatable where Database: QuerySupporting {
-    /// Authenticates using the supplied credentials, connection, and verifier.
+    /// Authenticates using the supplied credentials and connection.
     public static func authenticate(
         using bearer: BearerAuthorization,
         on connection: DatabaseConnectable
