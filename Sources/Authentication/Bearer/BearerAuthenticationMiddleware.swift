@@ -1,25 +1,21 @@
 import Fluent
 import Vapor
 
-/// Protects a route group, requiring a password authenticatable
+/// Protects a route group, requiring a token authenticatable
 /// instance to pass through.
+///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public final class PasswordAuthenticationMiddleware<A>: Middleware
-    where A: PasswordAuthenticatable, A.Database: QuerySupporting
+public final class BearerAuthenticationMiddleware<A>: Middleware
+    where A: BearerAuthenticatable, A.Database: QuerySupporting
 {
-    /// the required password verifier
-    public let verifier: PasswordVerifier
-
     /// The database identifier
     public let database: DatabaseIdentifier<A.Database>
 
     /// create a new password auth middleware
     public init(
         _ type: A.Type = A.self,
-        verifier: PasswordVerifier,
         database: DatabaseIdentifier<A.Database>
     ) {
-        self.verifier = verifier
         self.database = database
     }
 
@@ -31,7 +27,7 @@ public final class PasswordAuthenticationMiddleware<A>: Middleware
             return try next.respond(to: req)
         }
 
-        guard let password = req.http.headers.basicAuthorization else {
+        guard let token = req.http.headers.bearerAuthorization else {
             throw AuthenticationError(
                 identifier: "invalidCredentials",
                 reason: "Basic authorization header required."
@@ -42,8 +38,7 @@ public final class PasswordAuthenticationMiddleware<A>: Middleware
         return req.connect(to: database).flatMap(to: Response.self) { conn in
             // auth user on connection
             return A.authenticate(
-                using: password,
-                verifier: self.verifier,
+                using: token,
                 on: conn
             ).flatMap(to: Response.self) { a in
                 guard let a = a else {
@@ -55,5 +50,17 @@ public final class PasswordAuthenticationMiddleware<A>: Middleware
                 return try next.respond(to: req)
             }
         }
+    }
+}
+
+extension BearerAuthenticatable where Database: QuerySupporting {
+    /// Creates a basic auth middleware for this model.
+    /// See `BasicAuthenticationMiddleware`.
+    public static func bearerAuthMiddleware(
+        database: DatabaseIdentifier<Database>? = nil
+    ) throws -> BearerAuthenticationMiddleware<Self> {
+        return try BearerAuthenticationMiddleware(
+            database: database ?? Self.requireDefaultDatabase()
+        )
     }
 }

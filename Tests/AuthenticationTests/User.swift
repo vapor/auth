@@ -3,15 +3,18 @@ import Async
 import FluentSQLite
 import Foundation
 
-let test = DatabaseIdentifier<SQLiteDatabase>("test")
+extension DatabaseIdentifier {
+    static var test: DatabaseIdentifier<SQLiteDatabase> {
+        return .init("test")
+    }
+}
 
-final class User: Model, Migration, PasswordAuthenticatable {
+final class User: Model, Migration, BasicAuthenticatable {
     typealias Database = SQLiteDatabase
     
     static let idKey = \User.id
     static let usernameKey = \User.email
     static let passwordKey = \User.password
-    static let database = test
 
     var id: UUID?
     var name: String
@@ -22,18 +25,5 @@ final class User: Model, Migration, PasswordAuthenticatable {
         self.name = name
         self.email = email
         self.password = password
-    }
-
-    static func prepare(on connection: SQLiteConnection) -> Future<Void> {
-        return SQLiteDatabase.create(self, on: connection) { table in
-            try table.field(for: \.id)
-            try table.field(for: \.name)
-            try table.field(for: \.email)
-            try table.field(for: \.password)
-        }
-    }
-
-    static func revert(on connection: SQLiteConnection) -> Future<Void> {
-        return SQLiteDatabase.delete(self, on: connection)
     }
 }

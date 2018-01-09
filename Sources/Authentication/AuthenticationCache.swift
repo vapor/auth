@@ -29,7 +29,7 @@ extension Request {
     public func authenticate<A>(_ instance: A) throws
         where A: Authenticatable
     {
-        let cache = try make(AuthenticationCache.self)
+        let cache = try privateContainer.make(AuthenticationCache.self, for: Request.self)
         cache[A.self] = instance
     }
 
@@ -38,7 +38,7 @@ extension Request {
     public func authenticated<A>(_ type: A.Type) throws -> A?
         where A: Authenticatable
     {
-        let cache = try make(AuthenticationCache.self)
+        let cache = try privateContainer.make(AuthenticationCache.self, for: Request.self)
         return cache[A.self]
     }
 

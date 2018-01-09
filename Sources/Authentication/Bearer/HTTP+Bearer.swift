@@ -4,7 +4,7 @@ import HTTP
 
 extension HTTPHeaders {
     /// Access or set the `Authorization: Basic: ...` header.
-    public var bearerAuthorization: BearerToken? {
+    public var bearerAuthorization: BearerAuthorization? {
         get {
             guard let string = self[.authorization] else {
                 return nil
@@ -15,11 +15,11 @@ extension HTTPHeaders {
             }
 
             let token = string[range.upperBound...]
-            return .init(string: String(token))
+            return .init(token: String(token))
         }
         set {
-            if let token = newValue {
-                self[.authorization] = "Bearer \(token.string)"
+            if let bearer = newValue {
+                self[.authorization] = "Bearer \(bearer.token)"
             } else {
                 self[.authorization] = nil
             }
