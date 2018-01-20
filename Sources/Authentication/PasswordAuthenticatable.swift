@@ -13,7 +13,7 @@ extension PasswordAuthenticatable where Database: QuerySupporting {
         password: String,
         on worker: DatabaseConnectable & Container
     ) -> Future<Self?> {
-        return Future {
+        return Future<Self?>.flatMap {
             return try Self.authenticate(
                 using: .init(username: username, password: password),
                 verifier: worker.make(PasswordVerifier.self, for: Self.self),

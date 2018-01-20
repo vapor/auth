@@ -6,14 +6,14 @@ import XCTest
 
 class AuthenticationTests: XCTestCase {
     func testPassword() throws {
-        let queue = DispatchEventLoop(label: "test.auth")
+        let queue = try DefaultEventLoop(label: "test.auth")
         
-        let database = SQLiteDatabase(storage: .memory)
+        let database = try SQLiteDatabase(storage: .memory)
         let conn = try database.makeConnection(on: queue).blockingAwait()
 
         try User.prepare(on: conn).blockingAwait()
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        try user.save(on: conn).blockingAwait()
+        _ = try user.save(on: conn).await(on: queue)
 
         let password = BasicAuthorization(username: "tanner@vapor.codes", password: "foo")
         let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).blockingAwait()
@@ -23,10 +23,10 @@ class AuthenticationTests: XCTestCase {
     func testApplication() throws {
         var services = Services.default()
         try services.register(FluentProvider())
-        try services.register(SQLiteProvider())
+        try services.register(FluentSQLiteProvider())
         try services.register(AuthenticationProvider())
 
-        let sqlite = SQLiteDatabase(storage: .memory)
+        let sqlite = try SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
         services.register(databases)
@@ -41,7 +41,7 @@ class AuthenticationTests: XCTestCase {
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        try user.save(on: conn).blockingAwait()
+        _ = try user.save(on: conn).await(on: app)
 
         let router = try app.make(Router.self)
 
@@ -60,16 +60,16 @@ class AuthenticationTests: XCTestCase {
         let responder = try app.make(Responder.self)
         let res = try responder.respond(to: req).blockingAwait()
         XCTAssertEqual(res.http.status, .ok)
-        XCTAssertEqual(res.http.body.data, Data("Tanner".utf8))
+        try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
     }
 
     func testSessionPersist() throws {
         var services = Services.default()
         try services.register(FluentProvider())
-        try services.register(SQLiteProvider())
+        try services.register(FluentSQLiteProvider())
         try services.register(AuthenticationProvider())
 
-        let sqlite = SQLiteDatabase(storage: .memory)
+        let sqlite = try SQLiteDatabase(storage: .memory)
         var databases = DatabaseConfig()
         databases.add(database: sqlite, as: .test)
         services.register(databases)
@@ -88,7 +88,7 @@ class AuthenticationTests: XCTestCase {
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        try user.save(on: conn).blockingAwait()
+        _ = try user.save(on: conn).await(on: app)
 
         let router = try app.make(Router.self)
 
@@ -124,7 +124,7 @@ class AuthenticationTests: XCTestCase {
 
             let res = try responder.respond(to: req).blockingAwait()
             XCTAssertEqual(res.http.status, .ok)
-            XCTAssertEqual(res.http.body.data, Data("Tanner".utf8))
+            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
             session = String(res.headers[.setCookie]!.split(separator: ";").first!)
         }
 
@@ -138,7 +138,7 @@ class AuthenticationTests: XCTestCase {
 
             let res = try responder.respond(to: req).blockingAwait()
             XCTAssertEqual(res.http.status, .ok)
-            XCTAssertEqual(res.http.body.data, Data("Tanner".utf8))
+            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
         }
 
         /// persisted, no-session req
