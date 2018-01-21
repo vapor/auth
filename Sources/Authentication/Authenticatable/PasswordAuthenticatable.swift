@@ -66,16 +66,16 @@ extension PasswordAuthenticatable where Self: Entity {
         let user: Self
         
         if let verifier = passwordVerifier {
+            guard let hash = match.hashedPassword else {
+                throw AuthenticationError.invalidCredentials
+            }
+            
             guard let match = try Self
                 .makeQuery()
                 .filter(usernameKey, creds.username)
                 .first()
                 else {
                     throw AuthenticationError.invalidCredentials
-            }
-            
-            guard let hash = match.hashedPassword else {
-                throw AuthenticationError.invalidCredentials
             }
             
             guard try verifier.verify(
