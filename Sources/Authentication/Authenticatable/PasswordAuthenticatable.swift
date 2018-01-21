@@ -75,9 +75,10 @@ extension PasswordAuthenticatable where Self: Entity {
             guard try verifier.verify(
                 password: creds.password.makeBytes(),
                 matches: expectedPasswordHash.makeBytes()
-                ), user = match else {
+                ), let matchedUser = match else {
                     throw AuthenticationError.invalidCredentials
             }
+            user = matchedUser
         } else {
             guard let match = try Self
                 .makeQuery()
