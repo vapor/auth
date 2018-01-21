@@ -70,14 +70,16 @@ extension PasswordAuthenticatable where Self: Entity {
                 .makeQuery()
                 .filter(usernameKey, creds.username)
                 .first()
-            let expectedPasswordHash = match?.hashedPassword ?? ""
-            
+            let expectedPasswordHash = match?.hashedPassword ??
+                "$2a$10$N5NH4Xt9uj18GCd7W9Rl2eHrw8k6lhGpds5w389ux.bwZFMK5WSiq"
+
             guard try verifier.verify(
                 password: creds.password.makeBytes(),
                 matches: expectedPasswordHash.makeBytes()
                 ), let matchedUser = match else {
                     throw AuthenticationError.invalidCredentials
             }
+
             user = matchedUser
         } else {
             guard let match = try Self
