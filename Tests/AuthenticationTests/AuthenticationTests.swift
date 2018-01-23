@@ -14,7 +14,6 @@ class AuthenticationTests: XCTestCase {
         try User.prepare(on: conn).blockingAwait()
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         _ = try user.save(on: conn).await(on: queue)
-
         let password = BasicAuthorization(username: "tanner@vapor.codes", password: "foo")
         let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).blockingAwait()
         XCTAssertEqual(authed?.id, user.id)
@@ -42,7 +41,6 @@ class AuthenticationTests: XCTestCase {
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         _ = try user.save(on: conn).await(on: app)
-
         let router = try app.make(Router.self)
 
         let password = try User.basicAuthMiddleware(using: PlaintextVerifier())
@@ -65,7 +63,6 @@ class AuthenticationTests: XCTestCase {
 
     func testSessionPersist() throws {
         var services = Services.default()
-        try services.register(FluentProvider())
         try services.register(FluentSQLiteProvider())
         try services.register(AuthenticationProvider())
 
@@ -82,7 +79,10 @@ class AuthenticationTests: XCTestCase {
         middleware.use(SessionsMiddleware.self)
         services.register(middleware)
 
-        let app = try Application(services: services)
+        var config = Config.default()
+        config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+
+        let app = try Application(config: config, services: services)
 
         let conn = try app.requestConnection(to: .test).blockingAwait()
         defer { app.releaseConnection(conn, to: .test) }

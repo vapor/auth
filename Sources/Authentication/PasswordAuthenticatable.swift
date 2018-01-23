@@ -7,16 +7,18 @@ import Vapor
 public protocol PasswordAuthenticatable: BasicAuthenticatable { }
 
 extension PasswordAuthenticatable where Database: QuerySupporting {
-    /// Authenticates using a username and password on the supplied connection.
+    /// Authenticates using a username and password using the supplied
+    // verifier on the supplied connection.
     public static func authenticate(
         username: String,
         password: String,
-        on worker: DatabaseConnectable & Container
+        using verifier: PasswordVerifier,
+        on worker: DatabaseConnectable
     ) -> Future<Self?> {
         return Future<Self?>.flatMap {
             return try Self.authenticate(
                 using: .init(username: username, password: password),
-                verifier: worker.make(PasswordVerifier.self, for: Self.self),
+                verifier: verifier,
                 on: worker
             )
         }
