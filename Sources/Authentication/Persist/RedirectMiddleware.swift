@@ -1,13 +1,23 @@
 import Vapor
 
+/// Basic middleware to redirect unauthenticated requests to the supplied path
 public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
 
+    /// The path to redirect to
     let path: String
 
-    public init(A authenticableType: A.Type = A.self, path: String) {
+    /**
+     Initialise the `RedirectMiddleware`
+
+     - parameters:
+        - authenticatableType: The type to check authentication against
+        - path: The path to redirect to if the request is not authenticated
+     */
+    public init(A authenticatableType: A.Type = A.self, path: String) {
         self.path = path
     }
 
+    /// See Middleware.respond
     public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
         if try request.isAuthenticated(A.self) {
             return try next.respond(to: request)
