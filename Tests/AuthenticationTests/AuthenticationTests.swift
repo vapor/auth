@@ -63,7 +63,6 @@ class AuthenticationTests: XCTestCase {
 
     func testSessionPersist() throws {
         var services = Services.default()
-        try services.register(FluentProvider())
         try services.register(FluentSQLiteProvider())
         try services.register(AuthenticationProvider())
 
@@ -80,7 +79,10 @@ class AuthenticationTests: XCTestCase {
         middleware.use(SessionsMiddleware.self)
         services.register(middleware)
 
-        let app = try Application(services: services)
+        var config = Config.default()
+        config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+
+        let app = try Application(config: config, services: services)
 
         let conn = try app.requestConnection(to: .test).blockingAwait()
         defer { app.releaseConnection(conn, to: .test) }
