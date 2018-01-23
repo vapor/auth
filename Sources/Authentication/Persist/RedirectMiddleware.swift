@@ -24,4 +24,10 @@ public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
         }
         return Future(request.redirect(to: path))
     }
+
+    /// Use this middleware to redirect users away from
+    /// protected content to a login page
+    public static func login(path: String = "/login") -> RedirectMiddleware {
+        return RedirectMiddleware(path: path)
+    }
 }
