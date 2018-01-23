@@ -13,8 +13,7 @@ class AuthenticationTests: XCTestCase {
 
         try User.prepare(on: conn).blockingAwait()
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).blockingAwait()
-
+        _ = try user.save(on: conn).await(on: queue)
         let password = BasicAuthorization(username: "tanner@vapor.codes", password: "foo")
         let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).blockingAwait()
         XCTAssertEqual(authed?.id, user.id)
@@ -41,8 +40,7 @@ class AuthenticationTests: XCTestCase {
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).blockingAwait()
-
+        _ = try user.save(on: conn).await(on: app)
         let router = try app.make(Router.self)
 
         let password = try User.basicAuthMiddleware(using: PlaintextVerifier())
@@ -60,7 +58,7 @@ class AuthenticationTests: XCTestCase {
         let responder = try app.make(Responder.self)
         let res = try responder.respond(to: req).blockingAwait()
         XCTAssertEqual(res.http.status, .ok)
-        XCTAssertEqual(try res.http.body.makeData(max: 10).blockingAwait(), Data("Tanner".utf8))
+        try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
     }
 
     func testSessionPersist() throws {
@@ -88,7 +86,7 @@ class AuthenticationTests: XCTestCase {
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).blockingAwait()
+        _ = try user.save(on: conn).await(on: app)
 
         let router = try app.make(Router.self)
 
@@ -124,7 +122,7 @@ class AuthenticationTests: XCTestCase {
 
             let res = try responder.respond(to: req).blockingAwait()
             XCTAssertEqual(res.http.status, .ok)
-            XCTAssertEqual(try res.http.body.makeData(max: 10).blockingAwait(), Data("Tanner".utf8))
+            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
             session = String(res.headers[.setCookie]!.split(separator: ";").first!)
         }
 
@@ -138,7 +136,7 @@ class AuthenticationTests: XCTestCase {
 
             let res = try responder.respond(to: req).blockingAwait()
             XCTAssertEqual(res.http.status, .ok)
-            XCTAssertEqual(try res.http.body.makeData(max: 10).blockingAwait(), Data("Tanner".utf8))
+            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
         }
 
         /// persisted, no-session req

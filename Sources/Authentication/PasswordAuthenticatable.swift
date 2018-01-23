@@ -14,9 +14,9 @@ extension PasswordAuthenticatable where Database: QuerySupporting {
         password: String,
         using verifier: PasswordVerifier,
         on worker: DatabaseConnectable
-        ) -> Future<Self?> {
-        return Future {
-            return Self.authenticate(
+    ) -> Future<Self?> {
+        return Future<Self?>.flatMap {
+            return try Self.authenticate(
                 using: .init(username: username, password: password),
                 verifier: verifier,
                 on: worker
