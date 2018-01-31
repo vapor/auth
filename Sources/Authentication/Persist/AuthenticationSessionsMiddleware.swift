@@ -4,7 +4,7 @@ import Vapor
 /// Persists authentication done by another auth middleware
 /// allowing the authentication to only be passed once.
 public final class AuthenticationSessionsMiddleware<A>: Middleware
-    where A: Authenticatable, A.Database: QuerySupporting
+    where A: Authenticatable, A.Database: QuerySupporting, A.ID: StringConvertible
 {
     /// The database identifier
     public let database: DatabaseIdentifier<A.Database>
@@ -55,18 +55,21 @@ public final class AuthenticationSessionsMiddleware<A>: Middleware
 
 extension Request {
     /// Authenticates the model into the session.
-    public func authenticateSession<A>(_ a: A) throws where A: Authenticatable {
-        try session().data.storage["_" + A.name + "Session"] = a.requireID()
+    public func authenticateSession<A>(_ a: A) throws where A: Authenticatable, A.ID: StringConvertible {
+        try session()["_" + A.name + "Session"] = try a.requireID().convertToString()
     }
 
     /// Returns the authenticatable type's ID if it exists
     /// in the session data.
-    public func authenticatedSession<A>(_ a: A.Type) throws -> A.ID? where A: Authenticatable  {
-        return try session().data.storage["_" + A.name + "Session"] as? A.ID
+    public func authenticatedSession<A>(_ a: A.Type) throws -> A.ID? where A: Authenticatable, A.ID: StringConvertible  {
+        guard let idString = try session()["_" + A.name + "Session"] else {
+            return nil
+        }
+        return try A.ID.convertFromString(idString)
     }
 }
 
-extension Authenticatable where Database: QuerySupporting {
+extension Authenticatable where Database: QuerySupporting, Self.ID: StringConvertible {
     /// Create a `AuthenticationSessionsMiddleware` for this model.
     /// See `AuthenticationSessionsMiddleware`.
     public static func authSessionsMiddleware() throws -> AuthenticationSessionsMiddleware<Self> {

@@ -125,7 +125,7 @@ class AuthenticationTests: XCTestCase {
             let res = try responder.respond(to: req).blockingAwait()
             XCTAssertEqual(res.http.status, .ok)
             try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
-            session = String(res.headers[.setCookie]!.split(separator: ";").first!)
+            session = String(res.http.headers[.setCookie]!.split(separator: ";").first!)
         }
 
         /// persisted req
@@ -133,7 +133,7 @@ class AuthenticationTests: XCTestCase {
             let req = Request(using: app)
             req.http.method = .get
             req.http.uri.path = "/test"
-            req.headers[.cookie] = session + ";"
+            req.http.headers[.cookie] = session + ";"
             print(session)
 
             let res = try responder.respond(to: req).blockingAwait()
