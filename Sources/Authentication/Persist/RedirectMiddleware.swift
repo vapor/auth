@@ -6,13 +6,11 @@ public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
     /// The path to redirect to
     let path: String
 
-    /**
-     Initialise the `RedirectMiddleware`
-
-     - parameters:
-        - authenticatableType: The type to check authentication against
-        - path: The path to redirect to if the request is not authenticated
-     */
+    /// Initialise the `RedirectMiddleware`
+    ///
+    /// - parameters:
+    ///    - authenticatableType: The type to check authentication against
+    ///    - path: The path to redirect to if the request is not authenticated
     public init(A authenticatableType: A.Type = A.self, path: String) {
         self.path = path
     }
