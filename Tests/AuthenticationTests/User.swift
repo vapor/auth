@@ -11,8 +11,9 @@ extension DatabaseIdentifier {
 
 final class User: Model, Migration, BasicAuthenticatable {
     typealias Database = SQLiteDatabase
+    typealias ID = UUID
     
-    static let idKey = \User.id
+    static let idKey: IDKey = \User.id
     static let usernameKey = \User.email
     static let passwordKey = \User.password
 
