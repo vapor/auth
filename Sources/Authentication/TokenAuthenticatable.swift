@@ -17,7 +17,7 @@ public protocol Token: BearerAuthenticatable {
         where UserType.Database == Database
 
     /// A relation to the user that owns this token.
-    static var userIDKey: ReferenceWritableKeyPath<Self, UserType.ID> { get }
+    static var userIDKey: WritableKeyPath<Self, UserType.ID> { get }
 }
 
 extension TokenAuthenticatable {

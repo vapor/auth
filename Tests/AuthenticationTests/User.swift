@@ -14,8 +14,8 @@ final class User: Model, Migration, BasicAuthenticatable {
     typealias ID = UUID
     
     static let idKey: IDKey = \User.id
-    static let usernameKey = \User.email
-    static let passwordKey = \User.password
+    static let usernameKey: UsernameKey = \User.email
+    static let passwordKey: PasswordKey = \User.password
 
     var id: UUID?
     var name: String
