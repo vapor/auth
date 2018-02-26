@@ -1,9 +1,9 @@
 <p align="center">
-    <img src="https://cloud.githubusercontent.com/assets/1342803/24793053/ca0a2b80-1b80-11e7-8466-830c9ded1903.png" width="320" alt="Auth">
+    <img src="https://user-images.githubusercontent.com/1342803/36690387-2b24de90-1b00-11e8-8a8a-5cae6c96261b.png" height="64" alt="Auth">
     <br>
     <br>
-    <a href="https://docs.vapor.codes/2.0/auth/package/">
-        <img src="http://img.shields.io/badge/read_the-docs-92A8D1.svg" alt="Documentation">
+    <a href="https://docs.vapor.codes/3.0/">
+        <img src="http://img.shields.io/badge/read_the-docs-2196f3.svg" alt="Documentation">
     </a>
     <a href="http://vapor.team">
         <img src="http://vapor.team/badge.svg" alt="Slack Team">
@@ -15,6 +15,6 @@
         <img src="https://circleci.com/gh/vapor/auth.svg?style=shield" alt="Continuous Integration">
     </a>
     <a href="https://swift.org">
-        <img src="http://img.shields.io/badge/swift-3.1-brightgreen.svg" alt="Swift 3.1">
+        <img src="http://img.shields.io/badge/swift-4.1-brightgreen.svg" alt="Swift 4.1">
     </a>
 </p>
