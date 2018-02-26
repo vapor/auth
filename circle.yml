@@ -15,7 +15,7 @@ jobs:
       - checkout
       - run: swift build
       - run: swift build -c release
-      - run: export ENABLE_TESTS=true; swift test;
+      - run: export ENABLE_TESTS=true; swift test
 workflows:
   version: 2
   tests:
