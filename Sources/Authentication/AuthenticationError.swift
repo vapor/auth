@@ -2,7 +2,7 @@ import Debugging
 import Vapor
 
 /// Errors that can be thrown while working with Authentication.
-public struct AuthenticationError: Traceable, Debuggable, Error {
+public struct AuthenticationError: Debuggable {
     /// See Debuggable.readableName
     public static let readableName = "Authentication Error"
 
@@ -12,36 +12,21 @@ public struct AuthenticationError: Traceable, Debuggable, Error {
     /// See Debuggable.reason
     public var reason: String
 
-    /// See Traceable.
-    public var file: String
+    /// See Debuggable.sourceLocation
+    public var sourceLocation: SourceLocation?
 
-    /// See Traceable.function
-    public var function: String
-
-    /// See Traceable.line
-    public var line: UInt
-
-    /// See Traceable.column
-    public var column: UInt
-
-    /// See Traceable.stackTrace
+    /// See stackTrace
     public var stackTrace: [String]
 
     /// Create a new authentication error.
     init(
         identifier: String,
         reason: String,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line,
-        column: UInt = #column
+        source: SourceLocation
     ) {
         self.identifier = identifier
         self.reason = reason
-        self.file = file
-        self.function = function
-        self.line = line
-        self.column = column
+        self.sourceLocation = source
         self.stackTrace = AuthenticationError.makeStackTrace()
     }
 }

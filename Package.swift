@@ -1,5 +1,6 @@
 // swift-tools-version:4.0
 import PackageDescription
+import Foundation
 
 let package = Package(
     name: "Auth",
@@ -30,6 +31,10 @@ let package = Package(
     ],
     targets: [
         .target(name: "Authentication", dependencies: ["Async", "Bits", "Crypto", "Debugging", "Fluent", "HTTP", "Service", "Vapor"]),
-        .testTarget(name: "AuthenticationTests", dependencies: ["Authentication", "FluentSQLite", "Vapor"]),
     ]
 )
+
+if ProcessInfo.processInfo.environment["ENABLE_TESTS"]?.lowercased() == "true" {
+    package.dependencies.append(.package(url: "https://github.com/vapor/fluent-sqlite.git", from: "3.0.0-rc"))
+    package.targets.append(.testTarget(name: "AuthenticationTests", dependencies: ["Authentication", "FluentSQLite", "Vapor"]))
+}

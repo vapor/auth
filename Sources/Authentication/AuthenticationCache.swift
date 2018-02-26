@@ -58,7 +58,8 @@ extension Request {
         guard let a = try authenticated(A.self) else {
             throw AuthenticationError(
                 identifier: "notAuthenticated",
-                reason: "\(A.self) has not been authenticated."
+                reason: "\(A.self) has not been authenticated.",
+                source: .capture()
             )
         }
         return a

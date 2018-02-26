@@ -25,7 +25,7 @@ extension FixedWidthInteger {
     /// See `StringConvertible.convertFromString(_:)`
     public static func convertFromString(_ string: String) throws -> Self {
         guard let fwi = Self(string) else {
-            throw AuthenticationError(identifier: "fixedWidthInteger", reason: "Could not convert string \(string) to \(Self.self)")
+            throw AuthenticationError(identifier: "fixedWidthInteger", reason: "Could not convert string \(string) to \(Self.self)", source: .capture())
         }
         return fwi
     }
@@ -51,7 +51,7 @@ extension UUID: StringConvertible {
     /// See `StringConvertible.convertFromString(_:)`
     public static func convertFromString(_ string: String) throws -> UUID {
         guard let uuid = UUID(uuidString: string) else {
-            throw AuthenticationError(identifier: "uuid", reason: "Could not convert string \(string) to UUID")
+            throw AuthenticationError(identifier: "uuid", reason: "Could not convert string \(string) to UUID", source: .capture())
         }
         return uuid
     }

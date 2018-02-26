@@ -17,7 +17,7 @@ public final class AuthenticationProvider: Provider {
         services.register(PasswordVerifier.self) { container in
             return PlaintextVerifier()
         }
-        services.register(isSingleton: true) { container in
+        services.register { container in
             return AuthenticationCache()
         }
     }
