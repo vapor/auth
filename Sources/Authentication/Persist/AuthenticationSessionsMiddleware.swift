@@ -59,6 +59,11 @@ extension Request {
         try session()["_" + A.name + "Session"] = try a.requireID().convertToString()
     }
 
+    /// Un-authenticates the model from the session.
+    public func unauthenticateSession<A>(_ a: A.Type) throws where A: Authenticatable, A.ID: StringConvertible {
+        try session()["_" + A.name + "Session"] = nil
+    }
+
     /// Returns the authenticatable type's ID if it exists
     /// in the session data.
     public func authenticatedSession<A>(_ a: A.Type) throws -> A.ID? where A: Authenticatable, A.ID: StringConvertible  {

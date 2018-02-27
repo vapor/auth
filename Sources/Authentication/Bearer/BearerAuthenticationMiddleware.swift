@@ -5,9 +5,7 @@ import Vapor
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public final class BearerAuthenticationMiddleware<A>: Middleware
-    where A: BearerAuthenticatable, A.Database: QuerySupporting
-{
+public final class BearerAuthenticationMiddleware<A>: Middleware where A: BearerAuthenticatable {
     /// The database identifier
     public let database: DatabaseIdentifier<A.Database>
 
@@ -54,7 +52,7 @@ public final class BearerAuthenticationMiddleware<A>: Middleware
     }
 }
 
-extension BearerAuthenticatable where Database: QuerySupporting {
+extension BearerAuthenticatable {
     /// Creates a basic auth middleware for this model.
     /// See `BasicAuthenticationMiddleware`.
     public static func bearerAuthMiddleware(
