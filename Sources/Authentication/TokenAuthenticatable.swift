@@ -16,6 +16,9 @@ public protocol Token: BearerAuthenticatable {
     associatedtype UserType: Model
         where UserType.Database == Database
 
+    /// Key path to the user ID
+    typealias UserIDKey = WritableKeyPath<Self, UserType.ID>
+
     /// A relation to the user that owns this token.
     static var userIDKey: WritableKeyPath<Self, UserType.ID> { get }
 }
