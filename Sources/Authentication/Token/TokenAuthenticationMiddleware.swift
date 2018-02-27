@@ -36,11 +36,7 @@ extension TokenAuthenticatable {
     /// See `BasicAuthenticationMiddleware`.
     public static func tokenAuthMiddleware(
         database: DatabaseIdentifier<Database>? = nil
-        ) throws -> TokenAuthenticationMiddleware<Self> {
-        return try .init(
-            bearer: TokenType.bearerAuthMiddleware(
-                database: database ?? Self.requireDefaultDatabase()
-            )
-        )
+    ) -> TokenAuthenticationMiddleware<Self> {
+        return .init( bearer: TokenType.bearerAuthMiddleware())
     }
 }
