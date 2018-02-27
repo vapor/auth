@@ -18,7 +18,7 @@ public protocol TokenAuthenticatable: Authenticatable {
 
 extension TokenAuthenticatable where Self.Database: QuerySupporting {
     /// See `TokenAuthenticatable.authenticate(...)`
-    static func authenticate(
+    public static func authenticate(
         token: TokenType,
         on connection: DatabaseConnectable
     ) -> Future<Self?> {
