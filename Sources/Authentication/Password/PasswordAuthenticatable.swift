@@ -4,11 +4,19 @@ import Service
 import Vapor
 
 /// Authenticatable using a username and password.
-public protocol PasswordAuthenticatable: BasicAuthenticatable { }
+public protocol PasswordAuthenticatable: BasicAuthenticatable {
+    /// Authenticates using a username and password using the supplied
+    /// verifier on the supplied connection.
+    static func authenticate(
+        username: String,
+        password: String,
+        using verifier: PasswordVerifier,
+        on worker: DatabaseConnectable
+    ) -> Future<Self?>
+}
 
 extension PasswordAuthenticatable where Database: QuerySupporting {
-    /// Authenticates using a username and password using the supplied
-    // verifier on the supplied connection.
+    /// See `PasswordAuthenticatable.authenticate(...)`
     public static func authenticate(
         username: String,
         password: String,

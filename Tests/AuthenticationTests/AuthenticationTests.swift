@@ -43,7 +43,7 @@ class AuthenticationTests: XCTestCase {
         _ = try user.save(on: conn).await(on: app)
         let router = try app.make(Router.self)
 
-        let password = try User.basicAuthMiddleware(using: PlaintextVerifier())
+        let password = User.basicAuthMiddleware(using: PlaintextVerifier())
         let group = router.grouped(password)
         group.get("test") { req -> String in
             let user = try req.requireAuthenticated(User.self)
@@ -92,7 +92,7 @@ class AuthenticationTests: XCTestCase {
 
         let router = try app.make(Router.self)
 
-        let group = try router.grouped(
+        let group = router.grouped(
             User.basicAuthMiddleware(using: PlaintextVerifier()),
             User.authSessionsMiddleware()
         )

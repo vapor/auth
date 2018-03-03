@@ -9,7 +9,7 @@ extension DatabaseIdentifier {
     }
 }
 
-final class User: Model, Migration, BasicAuthenticatable {
+final class User: Model, Migration, BasicAuthenticatable, SessionAuthenticatable {
     typealias Database = SQLiteDatabase
     typealias ID = UUID
     

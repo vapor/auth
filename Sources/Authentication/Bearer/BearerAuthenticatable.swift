@@ -9,7 +9,27 @@ public protocol BearerAuthenticatable: Authenticatable {
 
     /// The key under which the model's unique token is stored.
     static var tokenKey: TokenKey { get }
+
+    /// Authenticates using the supplied credentials and connection.
+    static func authenticate(
+        using bearer: BearerAuthorization,
+        on connection: DatabaseConnectable
+    ) -> Future<Self?>
 }
+
+extension BearerAuthenticatable where Database: QuerySupporting {
+    /// See `BearerAuthenticatable.authenticate(...)`
+    public static func authenticate(
+        using bearer: BearerAuthorization,
+        on connection: DatabaseConnectable
+    ) -> Future<Self?> {
+        return Self
+            .query(on: connection)
+            .filter(tokenKey == bearer.token)
+            .first()
+    }
+}
+
 
 extension BearerAuthenticatable {
     /// Accesses the model's token

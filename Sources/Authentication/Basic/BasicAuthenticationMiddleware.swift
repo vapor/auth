@@ -5,23 +5,13 @@ import Vapor
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public final class BasicAuthenticationMiddleware<A>: Middleware
-    where A: BasicAuthenticatable, A.Database: QuerySupporting
-{
+public final class BasicAuthenticationMiddleware<A>: Middleware where A: BasicAuthenticatable {
     /// the required password verifier
     public let verifier: PasswordVerifier
 
-    /// The database identifier
-    public let database: DatabaseIdentifier<A.Database>
-
     /// create a new password auth middleware
-    public init(
-        authenticatable type: A.Type = A.self,
-        verifier: PasswordVerifier,
-        database: DatabaseIdentifier<A.Database>
-    ) {
+    public init(authenticatable type: A.Type = A.self, verifier: PasswordVerifier) {
         self.verifier = verifier
-        self.database = database
     }
 
     /// See Middleware.respond
@@ -41,22 +31,19 @@ public final class BasicAuthenticationMiddleware<A>: Middleware
             )
         }
 
-        // get database connection
-        return req.connect(to: self.database).flatMap(to: Response.self) { conn in
-            // auth user on connection
-            return A.authenticate(
-                using: password,
-                verifier: self.verifier,
-                on: conn
-            ).flatMap(to: Response.self) { a in
-                guard let a = a else {
-                    throw Abort(.unauthorized, reason: "Invalid credentials")
-                }
-
-                // set authed on request
-                try req.authenticate(a)
-                return try next.respond(to: req)
+        // auth user on connection
+        return A.authenticate(
+            using: password,
+            verifier: self.verifier,
+            on: req
+        ).flatMap(to: Response.self) { a in
+            guard let a = a else {
+                throw Abort(.unauthorized, reason: "Invalid credentials")
             }
+
+            // set authed on request
+            try req.authenticate(a)
+            return try next.respond(to: req)
         }
     }
 }
@@ -64,13 +51,7 @@ public final class BasicAuthenticationMiddleware<A>: Middleware
 extension BasicAuthenticatable where Database: QuerySupporting {
     /// Creates a basic auth middleware for this model.
     /// See `BasicAuthenticationMiddleware`.
-    public static func basicAuthMiddleware(
-        using verifier: PasswordVerifier,
-        database: DatabaseIdentifier<Database>? = nil
-    ) throws -> BasicAuthenticationMiddleware<Self> {
-        return try BasicAuthenticationMiddleware(
-            verifier: verifier,
-            database: database ?? Self.requireDefaultDatabase()
-        )
+    public static func basicAuthMiddleware(using verifier: PasswordVerifier) -> BasicAuthenticationMiddleware<Self> {
+        return BasicAuthenticationMiddleware(verifier: verifier)
     }
 }

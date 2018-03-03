@@ -5,19 +5,9 @@ import Vapor
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public final class BearerAuthenticationMiddleware<A>: Middleware
-    where A: BearerAuthenticatable, A.Database: QuerySupporting
-{
-    /// The database identifier
-    public let database: DatabaseIdentifier<A.Database>
-
+public final class BearerAuthenticationMiddleware<A>: Middleware where A: BearerAuthenticatable {
     /// Creates a new `BearerAuthenticationMiddleware`.
-    public init(
-        _ type: A.Type = A.self,
-        database: DatabaseIdentifier<A.Database>
-    ) {
-        self.database = database
-    }
+    public init(_ type: A.Type = A.self) {}
 
     /// See Middleware.respond
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
@@ -35,33 +25,26 @@ public final class BearerAuthenticationMiddleware<A>: Middleware
             )
         }
 
-        // get database connection
-        return req.connect(to: database).flatMap(to: Response.self) { conn in
-            // auth user on connection
-            return A.authenticate(
-                using: token,
-                on: conn
-            ).flatMap(to: Response.self) { a in
-                guard let a = a else {
-                    throw Abort(.unauthorized, reason: "Invalid credentials")
-                }
-                
-                // set authed on request
-                try req.authenticate(a)
-                return try next.respond(to: req)
+        // auth user on connection
+        return A.authenticate(
+            using: token,
+            on: req
+        ).flatMap(to: Response.self) { a in
+            guard let a = a else {
+                throw Abort(.unauthorized, reason: "Invalid credentials")
             }
+
+            // set authed on request
+            try req.authenticate(a)
+            return try next.respond(to: req)
         }
     }
 }
 
-extension BearerAuthenticatable where Database: QuerySupporting {
+extension BearerAuthenticatable {
     /// Creates a basic auth middleware for this model.
     /// See `BasicAuthenticationMiddleware`.
-    public static func bearerAuthMiddleware(
-        database: DatabaseIdentifier<Database>? = nil
-    ) throws -> BearerAuthenticationMiddleware<Self> {
-        return try BearerAuthenticationMiddleware(
-            database: database ?? Self.requireDefaultDatabase()
-        )
+    public static func bearerAuthMiddleware() -> BearerAuthenticationMiddleware<Self> {
+        return BearerAuthenticationMiddleware()
     }
 }

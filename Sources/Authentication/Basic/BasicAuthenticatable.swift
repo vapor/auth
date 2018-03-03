@@ -17,7 +17,44 @@ public protocol BasicAuthenticatable: Authenticatable {
     /// The key under which the user's password
     /// is stored.
     static var passwordKey: PasswordKey { get }
+
+    /// Authenticates using the supplied credentials, connection, and verifier.
+    static func authenticate(
+        using basic: BasicAuthorization,
+        verifier: PasswordVerifier,
+        on connection: DatabaseConnectable
+    ) -> Future<Self?>
 }
+
+extension BasicAuthenticatable where Database: QuerySupporting {
+    /// See `BasicAuthenticatable.authenticate(...)`
+    public static func authenticate(
+        using basic: BasicAuthorization,
+        verifier: PasswordVerifier,
+        on connection: DatabaseConnectable
+    ) -> Future<Self?> {
+        return Self
+            .query(on: connection)
+            .filter(usernameKey == basic.username)
+            .first()
+            .map(to: Self?.self)
+        { user in
+            guard let user = user else {
+                return nil
+            }
+
+            guard try verifier.verify(
+                password: basic.password,
+                matches: user.basicPassword
+            ) else {
+                return nil
+            }
+
+            return user
+        }
+    }
+}
+
 
 extension BasicAuthenticatable {
     /// Accesses the model's password
