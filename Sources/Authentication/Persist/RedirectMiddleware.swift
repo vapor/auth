@@ -20,7 +20,8 @@ public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
         if try request.isAuthenticated(A.self) {
             return try next.respond(to: request)
         }
-        return Future(request.redirect(to: path))
+        let redirect = request.redirect(to: path)
+        return Future.map(on: request) { redirect }
     }
 
     /// Use this middleware to redirect users away from

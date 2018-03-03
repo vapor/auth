@@ -1,12 +1,13 @@
 import Bits
 import Crypto
 import HTTP
+import Foundation
 
 extension HTTPHeaders {
     /// Access or set the `Authorization: Basic: ...` header.
     public var basicAuthorization: BasicAuthorization? {
         get {
-            guard let string = self[.authorization] else {
+            guard let string = self[.authorization].first else {
                 return nil
             }
 
@@ -15,9 +16,7 @@ extension HTTPHeaders {
             }
 
             let token = string[range.upperBound...]
-            guard let decodedToken = try? Base64Decoder().decode(string: String(token)) else {
-                return nil
-            }
+            let decodedToken = String(token).base64Decoded()
 
             let parts = decodedToken.split(separator: .colon)
 
@@ -37,10 +36,10 @@ extension HTTPHeaders {
         set {
             if let basic = newValue {
                 let credentials = "\(basic.username):\(basic.password)"
-                let encoded = Base64Encoder().encode(string: credentials)
-                self[.authorization] = "Basic \(encoded)"
+                let encoded = Data(credentials.utf8).base64Encoded()!
+                replaceOrAdd(name: .authorization, value: "Basic \(encoded)")
             } else {
-                self[.authorization] = nil
+                remove(name: .authorization)
             }
         }
     }
