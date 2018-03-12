@@ -23,10 +23,12 @@ extension BearerAuthenticatable where Database: QuerySupporting {
         using bearer: BearerAuthorization,
         on connection: DatabaseConnectable
     ) -> Future<Self?> {
-        return Self
-            .query(on: connection)
-            .filter(tokenKey == bearer.token)
-            .first()
+        return Future.flatMap(on: connection) {
+            return try Self
+                .query(on: connection)
+                .filter(tokenKey == bearer.token)
+                .first()
+        }
     }
 }
 

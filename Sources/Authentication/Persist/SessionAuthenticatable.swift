@@ -30,7 +30,9 @@ extension SessionAuthenticatable where Self.ID: StringConvertible {
 extension SessionAuthenticatable where Self.Database: QuerySupporting {
     /// See `SessionAuthenticatable.authenticate(id:on:)`
     public static func authenticate(id: ID, on connection: DatabaseConnectable) -> Future<Self?> {
-        return find(id, on: connection)
+        return Future.flatMap(on: connection) {
+            return try find(id, on: connection)
+        }
     }
 }
 
