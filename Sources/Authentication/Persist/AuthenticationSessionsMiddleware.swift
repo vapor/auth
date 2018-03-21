@@ -19,11 +19,11 @@ public final class AuthenticationSessionsMiddleware<A>: Middleware where A: Sess
                 }
 
                 // return done
-                return .done
+                return .done(on: req)
             }
         } else {
             // no need to authenticate
-            future = .done
+            future = .done(on: req)
         }
 
         // map the auth future to a resopnse

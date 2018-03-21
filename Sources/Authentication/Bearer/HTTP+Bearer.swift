@@ -6,7 +6,7 @@ extension HTTPHeaders {
     /// Access or set the `Authorization: Bearer: ...` header.
     public var bearerAuthorization: BearerAuthorization? {
         get {
-            guard let string = self[.authorization] else {
+            guard let string = self[.authorization].first else {
                 return nil
             }
 
@@ -19,9 +19,9 @@ extension HTTPHeaders {
         }
         set {
             if let bearer = newValue {
-                self[.authorization] = "Bearer \(bearer.token)"
+                replaceOrAdd(name: .authorization, value: "Bearer \(bearer.token)")
             } else {
-                self[.authorization] = nil
+                remove(name: .authorization)
             }
         }
     }

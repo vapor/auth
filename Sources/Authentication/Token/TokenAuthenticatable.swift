@@ -22,7 +22,9 @@ extension TokenAuthenticatable where Self.Database: QuerySupporting {
         token: TokenType,
         on connection: DatabaseConnectable
     ) -> Future<Self?> {
-        return token.authUser.get(on: connection).map(to: Self?.self) { $0 }
+        return Future.flatMap(on: connection) {
+            return try token.authUser.get(on: connection).map(to: Self?.self) { $0 }
+        }
     }
 
 }

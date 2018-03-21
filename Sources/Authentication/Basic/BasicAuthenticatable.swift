@@ -33,24 +33,26 @@ extension BasicAuthenticatable where Database: QuerySupporting {
         verifier: PasswordVerifier,
         on connection: DatabaseConnectable
     ) -> Future<Self?> {
-        return Self
-            .query(on: connection)
-            .filter(usernameKey == basic.username)
-            .first()
-            .map(to: Self?.self)
-        { user in
-            guard let user = user else {
-                return nil
-            }
+        return Future.flatMap(on: connection) {
+            return try Self
+                .query(on: connection)
+                .filter(usernameKey == basic.username)
+                .first()
+                .map(to: Self?.self)
+            { user in
+                guard let user = user else {
+                    return nil
+                }
 
-            guard try verifier.verify(
-                password: basic.password,
-                matches: user.basicPassword
-            ) else {
-                return nil
-            }
+                guard try verifier.verify(
+                    password: basic.password,
+                    matches: user.basicPassword
+                    ) else {
+                        return nil
+                }
 
-            return user
+                return user
+            }
         }
     }
 }
