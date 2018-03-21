@@ -16,7 +16,9 @@ extension HTTPHeaders {
             }
 
             let token = string[range.upperBound...]
-            let decodedToken = String(token).base64Decoded()
+            guard let decodedToken = Data(base64Encoded: .init(token)) else {
+                return nil
+            }
 
             let parts = decodedToken.split(separator: .colon)
 
@@ -36,7 +38,7 @@ extension HTTPHeaders {
         set {
             if let basic = newValue {
                 let credentials = "\(basic.username):\(basic.password)"
-                let encoded = Data(credentials.utf8).base64Encoded()!
+                let encoded = Data(credentials.utf8).base64EncodedString()
                 replaceOrAdd(name: .authorization, value: "Basic \(encoded)")
             } else {
                 remove(name: .authorization)

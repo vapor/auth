@@ -1,3 +1,4 @@
+import Async
 import Crypto
 import Service
 
@@ -23,7 +24,9 @@ public final class AuthenticationProvider: Provider {
     }
 
     /// See Provider.boot
-    public func boot(_ worker: Container) throws { }
+    public func didBoot(_ worker: Container) throws -> Future<Void> {
+        return .done(on: worker)
+    }
 }
 
 

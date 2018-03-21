@@ -6,16 +6,16 @@ import XCTest
 
 class AuthenticationTests: XCTestCase {
     func testPassword() throws {
-        let queue = try DefaultEventLoop(label: "test.auth")
+        let queue = try MultiThreadedEventLoopGroup(numThreads: 1)
         
         let database = try SQLiteDatabase(storage: .memory)
-        let conn = try database.makeConnection(on: queue).blockingAwait()
+        let conn = try database.makeConnection(on: queue).wait()
 
-        try User.prepare(on: conn).blockingAwait()
+        try User.prepare(on: conn).wait()
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).await(on: queue)
+        _ = try user.save(on: conn).wait()
         let password = BasicAuthorization(username: "tanner@vapor.codes", password: "foo")
-        let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).blockingAwait()
+        let authed = try User.authenticate(using: password, verifier: PlaintextVerifier(), on: conn).wait()
         XCTAssertEqual(authed?.id, user.id)
     }
 
@@ -36,11 +36,11 @@ class AuthenticationTests: XCTestCase {
 
         let app = try Application(services: services)
 
-        let conn = try app.requestConnection(to: .test).blockingAwait()
+        let conn = try app.requestConnection(to: .test).wait()
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).await(on: app)
+        _ = try user.save(on: conn).wait()
         let router = try app.make(Router.self)
 
         let password = User.basicAuthMiddleware(using: PlaintextVerifier())
@@ -51,14 +51,14 @@ class AuthenticationTests: XCTestCase {
         }
 
         let req = Request(using: app)
-        req.http.method = .get
-        req.http.uri.path = "/test"
+        req.http.method = .GET
+        req.http.urlString = "/test"
         req.http.headers.basicAuthorization = .init(username: "tanner@vapor.codes", password: "foo")
 
         let responder = try app.make(Responder.self)
-        let res = try responder.respond(to: req).blockingAwait()
+        let res = try responder.respond(to: req).wait()
         XCTAssertEqual(res.http.status, .ok)
-        try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
+        try XCTAssertEqual(res.http.body.consumeData(max: 100, on: app).wait(), Data("Tanner".utf8))
     }
 
     func testSessionPersist() throws {
@@ -78,17 +78,18 @@ class AuthenticationTests: XCTestCase {
         var middleware = MiddlewareConfig.default()
         middleware.use(SessionsMiddleware.self)
         services.register(middleware)
+        services.register(MemoryKeyedCache(on: EmbeddedEventLoop()), as: KeyedCache.self)
 
         var config = Config.default()
         config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
 
         let app = try Application(config: config, services: services)
 
-        let conn = try app.requestConnection(to: .test).blockingAwait()
+        let conn = try app.requestConnection(to: .test).wait()
         defer { app.releaseConnection(conn, to: .test) }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
-        _ = try user.save(on: conn).await(on: app)
+        _ = try user.save(on: conn).wait()
 
         let router = try app.make(Router.self)
 
@@ -107,10 +108,10 @@ class AuthenticationTests: XCTestCase {
         /// non-authed req
         do {
             let req = Request(using: app)
-            req.http.method = .get
-            req.http.uri.path = "/test"
+            req.http.method = .GET
+            req.http.urlString = "/test"
 
-            let res = try responder.respond(to: req).blockingAwait()
+            let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .unauthorized)
         }
 
@@ -118,36 +119,36 @@ class AuthenticationTests: XCTestCase {
         let session: String
         do {
             let req = Request(using: app)
-            req.http.method = .get
-            req.http.uri.path = "/test"
+            req.http.method = .GET
+            req.http.urlString = "/test"
             req.http.headers.basicAuthorization = .init(username: "tanner@vapor.codes", password: "foo")
 
-            let res = try responder.respond(to: req).blockingAwait()
+            let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .ok)
-            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
-            session = String(res.http.headers[.setCookie]!.split(separator: ";").first!)
+            try XCTAssertEqual(res.http.body.consumeData(max: 100, on: app).wait(), Data("Tanner".utf8))
+            session = String(res.http.headers[.setCookie].first!.split(separator: ";").first!)
         }
 
         /// persisted req
         do {
             let req = Request(using: app)
-            req.http.method = .get
-            req.http.uri.path = "/test"
-            req.http.headers[.cookie] = session + ";"
-            print(session)
+            req.http.method = .GET
+            req.http.urlString = "/test"
+            req.http.headers.replaceOrAdd(name: .cookie, value: session)
 
-            let res = try responder.respond(to: req).blockingAwait()
+
+            let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .ok)
-            try XCTAssertEqual(res.http.body.makeData(max: 100).await(on: app), Data("Tanner".utf8))
+            try XCTAssertEqual(res.http.body.consumeData(max: 100, on: app).wait(), Data("Tanner".utf8))
         }
 
         /// persisted, no-session req
         do {
             let req = Request(using: app)
-            req.http.method = .get
-            req.http.uri.path = "/test"
+            req.http.method = .GET
+            req.http.urlString = "/test"
 
-            let res = try responder.respond(to: req).blockingAwait()
+            let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .unauthorized)
         }
     }
