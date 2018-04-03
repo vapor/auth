@@ -44,11 +44,8 @@ extension BasicAuthenticatable where Database: QuerySupporting {
                     return nil
                 }
 
-                guard try verifier.verify(
-                    password: basic.password,
-                    matches: user.basicPassword
-                    ) else {
-                        return nil
+                guard try verifier.verify(basic.password, created: user.basicPassword) else {
+                    return nil
                 }
 
                 return user

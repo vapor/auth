@@ -13,7 +13,7 @@ public final class AuthenticationProvider: Provider {
     /// See Provider.register
     public func register(_ services: inout Services) throws {
         services.register(PasswordVerifier.self) { container in
-            return BCryptVerifier()
+            return BCryptDigest()
         }
         services.register(PasswordVerifier.self) { container in
             return PlaintextVerifier()
@@ -32,12 +32,4 @@ public final class AuthenticationProvider: Provider {
 
 
 /// A struct password verifier around bcrypt
-public final class BCryptVerifier: PasswordVerifier, Service {
-    /// Create a new bcrypt verifier
-    public init() {}
-
-    /// See PasswordVerifier.verify
-    public func verify(password: String, matches hash: String) throws -> Bool {
-        return try BCrypt.verify(message: password, matches: hash)
-    }
-}
+extension BCryptDigest: PasswordVerifier { }

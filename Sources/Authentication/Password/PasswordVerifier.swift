@@ -4,7 +4,7 @@ import Service
 /// Capable of verifying that a supplied password matches a hash.
 public protocol PasswordVerifier {
     /// Verifies that the supplied password matches a given hash.
-    func verify(password: String, matches hash: String) throws -> Bool
+    func verify(_ password: LosslessDataConvertible, created hash: LosslessDataConvertible) throws -> Bool
 }
 
 /// Simply compares the password to the hash.
@@ -14,7 +14,7 @@ public struct PlaintextVerifier: PasswordVerifier, Service {
     public init() {}
 
     /// See PasswordVerifier.verify
-    public func verify(password: String, matches hash: String) throws -> Bool {
-        return password == hash
+    public func verify(_ password: LosslessDataConvertible, created hash: LosslessDataConvertible) throws -> Bool {
+        return try password.convertToData() == hash.convertToData()
     }
 }
