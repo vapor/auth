@@ -1,5 +1,5 @@
 import Async
-@_exported import Crypto
+@_exported import BCrypt
 import Service
 
 /// Adds authentication services to a container
