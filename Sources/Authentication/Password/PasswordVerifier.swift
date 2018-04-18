@@ -14,7 +14,7 @@ public struct PlaintextVerifier: PasswordVerifier, Service {
     public init() {}
 
     /// See PasswordVerifier.verify
-    public func verify(_ password: LosslessDataConvertible, created hash: LosslessDataConvertible) throws -> Bool {
-        return try password.convertToData() == hash.convertToData()
+    public func verify(_ password: LosslessDataConvertible, created hash: LosslessDataConvertible) -> Bool {
+        return password.convertToData() == hash.convertToData()
     }
 }

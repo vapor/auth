@@ -42,6 +42,14 @@ extension Request {
         return cache[A.self]
     }
 
+    /// Unauthenticates an authenticatable type.
+    public func unauthenticate<A>(_ type: A.Type) throws
+        where A: Authenticatable
+    {
+        let cache = try privateContainer.make(AuthenticationCache.self)
+        cache[A.self] = nil
+    }
+
     /// Returns true if the type has been authenticated.
     public func isAuthenticated<A>(_ type: A.Type) throws -> Bool
         where A: Authenticatable

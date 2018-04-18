@@ -6,7 +6,7 @@ import XCTest
 
 class AuthenticationTests: XCTestCase {
     func testPassword() throws {
-        let queue = try MultiThreadedEventLoopGroup(numThreads: 1)
+        let queue = MultiThreadedEventLoopGroup(numThreads: 1)
         
         let database = try SQLiteDatabase(storage: .memory)
         let conn = try database.makeConnection(on: queue).wait()
@@ -102,6 +102,10 @@ class AuthenticationTests: XCTestCase {
             return user.name
         }
 
+        group.get("logout") { req -> HTTPStatus in
+            try req.unauthenticateSession(User.self)
+            return .ok
+        }
 
         let responder = try app.make(Responder.self)
 
@@ -147,6 +151,28 @@ class AuthenticationTests: XCTestCase {
             let req = Request(using: app)
             req.http.method = .GET
             req.http.urlString = "/test"
+
+            let res = try responder.respond(to: req).wait()
+            XCTAssertEqual(res.http.status, .unauthorized)
+        }
+
+        /// logout req
+        do {
+            let req = Request(using: app)
+            req.http.method = .GET
+            req.http.urlString = "/logout"
+            req.http.headers.replaceOrAdd(name: .cookie, value: session)
+
+            let res = try responder.respond(to: req).wait()
+            XCTAssertEqual(res.http.status, .ok)
+        }
+
+        /// logged-out persisted req
+        do {
+            let req = Request(using: app)
+            req.http.method = .GET
+            req.http.urlString = "/test"
+            req.http.headers.replaceOrAdd(name: .cookie, value: session)
 
             let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .unauthorized)

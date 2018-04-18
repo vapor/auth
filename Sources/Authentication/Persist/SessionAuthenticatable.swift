@@ -40,11 +40,13 @@ extension Request {
     /// Authenticates the model into the session.
     public func authenticateSession<A>(_ a: A) throws where A: SessionAuthenticatable {
         try session()["_" + A.name + "Session"] = try a.makeSessionID()
+        try authenticate(a)
     }
 
     /// Un-authenticates the model from the session.
     public func unauthenticateSession<A>(_ a: A.Type) throws where A: SessionAuthenticatable {
         try session()["_" + A.name + "Session"] = nil
+        try unauthenticate(A.self)
     }
 
     /// Returns the authenticatable type's ID if it exists

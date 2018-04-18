@@ -15,7 +15,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/crypto.git", from: "3.0.0-rc.2"),
 
         // 🚀 Non-blocking, event-driven networking for Swift (HTTP and WebSockets).
-        .package(url: "https://github.com/vapor/engine.git", from: "3.0.0-rc.2"),
+        .package(url: "https://github.com/vapor/http.git", from: "3.0.0-rc.2"),
 
         // 🖋 Swift ORM framework (queries, models, and relations) for building NoSQL and SQL database integrations.
         .package(url: "https://github.com/vapor/fluent.git", from: "3.0.0-rc.2"),
