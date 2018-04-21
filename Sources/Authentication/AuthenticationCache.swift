@@ -35,7 +35,7 @@ extension Request {
 
     /// Returns the authenticated instance of the supplied type.
     /// note: nil if no type has been authed, throws if there is a problem.
-    public func authenticated<A>(_ type: A.Type) throws -> A?
+    public func authenticated<A>(_ type: A.Type = A.self) throws -> A?
         where A: Authenticatable
     {
         let cache = try privateContainer.make(AuthenticationCache.self)
@@ -43,7 +43,7 @@ extension Request {
     }
 
     /// Unauthenticates an authenticatable type.
-    public func unauthenticate<A>(_ type: A.Type) throws
+    public func unauthenticate<A>(_ type: A.Type = A.self) throws
         where A: Authenticatable
     {
         let cache = try privateContainer.make(AuthenticationCache.self)
@@ -51,7 +51,7 @@ extension Request {
     }
 
     /// Returns true if the type has been authenticated.
-    public func isAuthenticated<A>(_ type: A.Type) throws -> Bool
+    public func isAuthenticated<A>(_ type: A.Type = A.self) throws -> Bool
         where A: Authenticatable
     {
         return try authenticated(A.self) != nil
@@ -60,7 +60,7 @@ extension Request {
     /// Returns an instance of the supplied type. Throws if no
     /// instance of that type has been authenticated or if there
     /// was a problem.
-    public func requireAuthenticated<A>(_ type: A.Type) throws -> A
+    public func requireAuthenticated<A>(_ type: A.Type = A.self) throws -> A
         where A: Authenticatable
     {
         guard let a = try authenticated(A.self) else {
