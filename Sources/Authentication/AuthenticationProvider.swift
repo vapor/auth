@@ -29,7 +29,5 @@ public final class AuthenticationProvider: Provider {
     }
 }
 
-
-
 /// A struct password verifier around bcrypt
 extension BCryptDigest: PasswordVerifier { }
