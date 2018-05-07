@@ -31,7 +31,7 @@ extension TokenAuthenticatable where Self.Database: QuerySupporting {
 
 /// A token, related to a user, capable of being used with Bearer auth.
 /// See `TokenAuthenticatable`.
-public protocol Token: BearerAuthenticatable {
+public protocol Token: BearerAuthenticatable, Model {
     /// The User type that owns this token.
     associatedtype UserType: Model
         where UserType.Database == Database

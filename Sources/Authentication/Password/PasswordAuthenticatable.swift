@@ -15,7 +15,7 @@ public protocol PasswordAuthenticatable: BasicAuthenticatable {
     ) -> Future<Self?>
 }
 
-extension PasswordAuthenticatable where Database: QuerySupporting {
+extension PasswordAuthenticatable where Self: Model, Self.Database: QuerySupporting {
     /// See `PasswordAuthenticatable.authenticate(...)`
     public static func authenticate(
         username: String,

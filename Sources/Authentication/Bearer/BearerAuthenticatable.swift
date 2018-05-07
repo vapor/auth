@@ -17,7 +17,7 @@ public protocol BearerAuthenticatable: Authenticatable {
     ) -> Future<Self?>
 }
 
-extension BearerAuthenticatable where Database: QuerySupporting {
+extension BearerAuthenticatable where Self: Model, Self.Database: QuerySupporting {
     /// See `BearerAuthenticatable.authenticate(...)`
     public static func authenticate(
         using bearer: BearerAuthorization,
