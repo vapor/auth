@@ -16,7 +16,7 @@ public protocol TokenAuthenticatable: Authenticatable {
     ) -> Future<Self?>
 }
 
-extension TokenAuthenticatable where Self.Database: QuerySupporting {
+extension TokenAuthenticatable where Self: Model, Self.Database: QuerySupporting {
     /// See `TokenAuthenticatable.authenticate(...)`
     public static func authenticate(
         token: TokenType,
