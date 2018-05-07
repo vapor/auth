@@ -3,7 +3,7 @@ import Bits
 import Fluent
 
 /// Authenticatable by `Bearer token` auth.
-public protocol BearerAuthenticatable: Authenticatable {
+public protocol BearerAuthenticatable: Authenticatable, Model {
     /// Key path to the token
     typealias TokenKey = WritableKeyPath<Self, String>
 
@@ -17,7 +17,7 @@ public protocol BearerAuthenticatable: Authenticatable {
     ) -> Future<Self?>
 }
 
-extension BearerAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+extension BearerAuthenticatable where Database: QuerySupporting {
     /// See `BearerAuthenticatable.authenticate(...)`
     public static func authenticate(
         using bearer: BearerAuthorization,

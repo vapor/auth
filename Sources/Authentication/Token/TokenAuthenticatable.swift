@@ -3,7 +3,7 @@ import Fluent
 import Vapor
 
 /// Authenticatable via a related token type.
-public protocol TokenAuthenticatable: Authenticatable {
+public protocol TokenAuthenticatable: Authenticatable, Model {
     /// The associated token type.
     associatedtype TokenType: Token
         where TokenType.UserType == Self
@@ -16,7 +16,7 @@ public protocol TokenAuthenticatable: Authenticatable {
     ) -> Future<Self?>
 }
 
-extension TokenAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+extension TokenAuthenticatable where Database: QuerySupporting {
     /// See `TokenAuthenticatable.authenticate(...)`
     public static func authenticate(
         token: TokenType,
@@ -31,7 +31,7 @@ extension TokenAuthenticatable where Self: Model, Self.Database: QuerySupporting
 
 /// A token, related to a user, capable of being used with Bearer auth.
 /// See `TokenAuthenticatable`.
-public protocol Token: BearerAuthenticatable, Model {
+public protocol Token: BearerAuthenticatable {
     /// The User type that owns this token.
     associatedtype UserType: Model
         where UserType.Database == Database

@@ -31,11 +31,11 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
     }
 }
 
-extension TokenAuthenticatable where Self: Model {
+extension TokenAuthenticatable {
     /// Creates a basic auth middleware for this model.
     /// See `BasicAuthenticationMiddleware`.
     public static func tokenAuthMiddleware(
-        database: DatabaseIdentifier<Self.Database>? = nil
+        database: DatabaseIdentifier<Database>? = nil
     ) -> TokenAuthenticationMiddleware<Self> {
         return .init( bearer: TokenType.bearerAuthMiddleware())
     }
