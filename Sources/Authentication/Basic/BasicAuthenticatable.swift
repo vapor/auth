@@ -54,7 +54,6 @@ extension BasicAuthenticatable where Self: Model, Self.Database: QuerySupporting
     }
 }
 
-
 extension BasicAuthenticatable {
     /// Accesses the model's password
     public var basicPassword: String {

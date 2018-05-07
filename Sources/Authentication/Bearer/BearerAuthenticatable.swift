@@ -32,7 +32,6 @@ extension BearerAuthenticatable where Database: QuerySupporting {
     }
 }
 
-
 extension BearerAuthenticatable {
     /// Accesses the model's token
     public var bearerToken: String {

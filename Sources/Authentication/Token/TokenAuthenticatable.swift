@@ -31,7 +31,6 @@ extension TokenAuthenticatable where Database: QuerySupporting {
             return try token.authUser.get(on: connection).map(to: Self?.self) { $0 }
         }
     }
-
 }
 
 /// A token, related to a user, capable of being used with Bearer auth.
