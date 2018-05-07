@@ -3,58 +3,57 @@ import Vapor
 
 /// Models conforming to this protocol can have their authentication
 /// status cached using `AuthenticationSessionsMiddleware`.
-public protocol SessionAuthenticatable: Authenticatable, Model {
-    /// Create a serializable String representation for this model's ID.
-    func makeSessionID() throws -> String
+public protocol SessionAuthenticatable: Authenticatable {
+    associatedtype SessionID: LosslessStringConvertible
 
-    /// Convert the serializable String representation for this model's ID
-    /// back into native ID format.
-    static func makeID(fromSessionID string: String) throws -> ID
+    var sessionID: SessionID? { get }
 
     /// Authenticate a model with the supplied ID.
-    static func authenticate(id: ID, on connection: DatabaseConnectable) -> Future<Self?>
+    static func authenticate(sessionID: SessionID, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension SessionAuthenticatable where Self.ID: StringConvertible {
-    /// See `SessionAuthenticatable.makeSessionID()`
-    public func makeSessionID() throws -> String {
-        return try requireID().convertToString()
+extension Model where Self: SessionAuthenticatable, Self.ID: LosslessStringConvertible, Self.Database: QuerySupporting {
+    /// See `SessionAuthenticatable`.
+    public typealias SessionID = Self.ID
+
+    /// See `SessionAuthenticatable`.
+    public var sessionID: Self.ID? {
+        return fluentID
     }
 
-    /// See `SessionAuthenticatable.makeID(fromSessionID:)`
-    public static func makeID(fromSessionID string: String) throws -> ID {
-        return try ID.convertFromString(string)
-    }
-}
-
-extension SessionAuthenticatable where Self.Database: QuerySupporting {
-    /// See `SessionAuthenticatable.authenticate(id:on:)`
-    public static func authenticate(id: ID, on connection: DatabaseConnectable) -> Future<Self?> {
-        return Future.flatMap(on: connection) {
-            return try find(id, on: connection)
+    /// See `SessionAuthenticatable`.
+    public static func authenticate(sessionID: Self.ID, on conn: DatabaseConnectable) -> Future<Self?> {
+        do {
+            return try find(sessionID, on: conn)
+        } catch {
+            return conn.eventLoop.newFailedFuture(error: error)
         }
     }
 }
 
+private extension SessionAuthenticatable {
+    static var sessionName: String {
+        return "\(Self.self)"
+    }
+}
+
 extension Request {
+
     /// Authenticates the model into the session.
     public func authenticateSession<A>(_ a: A) throws where A: SessionAuthenticatable {
-        try session()["_" + A.name + "Session"] = try a.makeSessionID()
+        try session()["_" + A.sessionName + "Session"] = a.sessionID?.description
         try authenticate(a)
     }
 
     /// Un-authenticates the model from the session.
     public func unauthenticateSession<A>(_ a: A.Type) throws where A: SessionAuthenticatable {
-        try session()["_" + A.name + "Session"] = nil
+        try session()["_" + A.sessionName + "Session"] = nil
         try unauthenticate(A.self)
     }
 
     /// Returns the authenticatable type's ID if it exists
     /// in the session data.
-    public func authenticatedSession<A>(_ a: A.Type) throws -> A.ID? where A: SessionAuthenticatable {
-        guard let idString = try session()["_" + A.name + "Session"] else {
-            return nil
-        }
-        return try A.makeID(fromSessionID: idString)
+    public func authenticatedSession<A>(_ a: A.Type) throws -> A.SessionID? where A: SessionAuthenticatable {
+        return try session()["_" + A.sessionName + "Session"].flatMap { A.SessionID.init($0) }
     }
 }

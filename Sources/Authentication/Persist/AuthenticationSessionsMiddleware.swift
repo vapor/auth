@@ -12,7 +12,7 @@ public final class AuthenticationSessionsMiddleware<A>: Middleware where A: Sess
         let future: Future<Void>
         if let aID = try req.authenticatedSession(A.self) {
             // try to find user with id from session
-            future = A.authenticate(id: aID, on: req).flatMap(to: Void.self) { a in
+            future = A.authenticate(sessionID: aID, on: req).flatMap(to: Void.self) { a in
                 // if the user was found, auth it
                 if let a = a {
                     try req.authenticate(a)

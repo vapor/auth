@@ -19,37 +19,22 @@ public protocol BasicAuthenticatable: Authenticatable {
     static var passwordKey: PasswordKey { get }
 
     /// Authenticates using the supplied credentials, connection, and verifier.
-    static func authenticate(
-        using basic: BasicAuthorization,
-        verifier: PasswordVerifier,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?>
+    static func authenticate(using basic: BasicAuthorization, verifier: PasswordVerifier, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
 extension BasicAuthenticatable where Self: Model, Self.Database: QuerySupporting {
     /// See `BasicAuthenticatable.authenticate(...)`
-    public static func authenticate(
-        using basic: BasicAuthorization,
-        verifier: PasswordVerifier,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?> {
-        return Future.flatMap(on: connection) {
-            return try Self
-                .query(on: connection)
-                .filter(usernameKey == basic.username)
-                .first()
-                .map(to: Self?.self)
-            { user in
-                guard let user = user else {
-                    return nil
-                }
-
-                guard try verifier.verify(basic.password, created: user.basicPassword) else {
+    public static func authenticate(using basic: BasicAuthorization, verifier: PasswordVerifier, on conn: DatabaseConnectable) -> Future<Self?> {
+        do {
+            return try Self.query(on: conn).filter(usernameKey == basic.username).first().map(to: Self?.self) { user in
+                guard let user = user, try verifier.verify(basic.password, created: user.basicPassword) else {
                     return nil
                 }
 
                 return user
             }
+        } catch {
+            return conn.eventLoop.newFailedFuture(error: error)
         }
     }
 }

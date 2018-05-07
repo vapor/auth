@@ -1,44 +1,31 @@
-import Async
-import Fluent
-import Vapor
-
-/// Used to abstract `Model` conformance one degree away from `TokenAuthenticatable`
-/// in order to eliminate "redundant conformance" errors due to the
-/// `TokenType.UserType: Model` conformance requirement.
-public protocol AuthenticableModel: Authenticatable, Model {}
-
 /// Authenticatable via a related token type.
-public protocol TokenAuthenticatable: AuthenticableModel {
+public protocol TokenAuthenticatable: Authenticatable {
     /// The associated token type.
     associatedtype TokenType: Token
-        where TokenType.UserType == Self
-
+        where TokenType.UserType == Self,
+              TokenType.Database == Self.Database
 
     /// Authenticates using the supplied token and connection.
-    static func authenticate(
-        token: TokenType,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?>
+    static func authenticate(token: TokenType, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension TokenAuthenticatable where Database: QuerySupporting {
-    /// See `TokenAuthenticatable.authenticate(...)`
-    public static func authenticate(
-        token: TokenType,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?> {
-        return Future.flatMap(on: connection) {
-            return try token.authUser.get(on: connection).map(to: Self?.self) { $0 }
+extension TokenAuthenticatable where Self.Database: QuerySupporting {
+    /// See `TokenAuthenticatable`.
+    public static func authenticate(token: TokenType, on conn: DatabaseConnectable) -> Future<Self?> {
+        do {
+            return try token.authUser.get(on: conn).map(to: Self?.self) { $0 }
+        } catch {
+            return conn.eventLoop.newFailedFuture(error: error)
         }
     }
 }
 
 /// A token, related to a user, capable of being used with Bearer auth.
 /// See `TokenAuthenticatable`.
-public protocol Token: BearerAuthenticatable {
+public protocol Token: BearerAuthenticatable & Model {
     /// The User type that owns this token.
     associatedtype UserType: Model
-        where UserType.Database == Database
+        where UserType.Database == Self.Database
 
     /// Key path to the user ID
     typealias UserIDKey = WritableKeyPath<Self, UserType.ID>
@@ -47,14 +34,14 @@ public protocol Token: BearerAuthenticatable {
     static var userIDKey: UserIDKey { get }
 }
 
-extension TokenAuthenticatable {
+extension TokenAuthenticatable where Self.Database: QuerySupporting {
     /// A relation to this user's tokens.
     public var authTokens: Children<Self, TokenType> {
         return children(TokenType.userIDKey)
     }
 }
 
-extension Token {
+extension Token where Self.Database: QuerySupporting {
     /// A relation to this token's owner.
     public var authUser: Parent<Self, UserType> {
         return parent(Self.userIDKey)

@@ -3,7 +3,7 @@ import Bits
 import Fluent
 
 /// Authenticatable by `Bearer token` auth.
-public protocol BearerAuthenticatable: Authenticatable, Model {
+public protocol BearerAuthenticatable: Authenticatable {
     /// Key path to the token
     typealias TokenKey = WritableKeyPath<Self, String>
 
@@ -11,23 +11,16 @@ public protocol BearerAuthenticatable: Authenticatable, Model {
     static var tokenKey: TokenKey { get }
 
     /// Authenticates using the supplied credentials and connection.
-    static func authenticate(
-        using bearer: BearerAuthorization,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?>
+    static func authenticate(using bearer: BearerAuthorization, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension BearerAuthenticatable where Database: QuerySupporting {
-    /// See `BearerAuthenticatable.authenticate(...)`
-    public static func authenticate(
-        using bearer: BearerAuthorization,
-        on connection: DatabaseConnectable
-    ) -> Future<Self?> {
-        return Future.flatMap(on: connection) {
-            return try Self
-                .query(on: connection)
-                .filter(tokenKey == bearer.token)
-                .first()
+extension BearerAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+    /// See `BearerAuthenticatable`.
+    public static func authenticate(using bearer: BearerAuthorization, on conn: DatabaseConnectable) -> Future<Self?> {
+        do {
+            return try Self.query(on: conn).filter(tokenKey == bearer.token).first()
+        } catch {
+            return conn.eventLoop.newFailedFuture(error: error)
         }
     }
 }
