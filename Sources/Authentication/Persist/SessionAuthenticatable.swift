@@ -3,7 +3,7 @@ import Vapor
 
 /// Models conforming to this protocol can have their authentication
 /// status cached using `AuthenticationSessionsMiddleware`.
-public protocol SessionAuthenticatable: Authenticatable {
+public protocol SessionAuthenticatable: Authenticatable, Model {
     /// Create a serializable String representation for this model's ID.
     func makeSessionID() throws -> String
 

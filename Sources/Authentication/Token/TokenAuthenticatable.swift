@@ -2,8 +2,13 @@ import Async
 import Fluent
 import Vapor
 
+/// Used to abstract `Model` conformance one degree away from `TokenAuthenticatable`
+/// in order to eliminate "redundant conformance" errors due to the
+/// `TokenType.UserType: Model` conformance requirement.
+public protocol AuthenticableModel: Authenticatable, Model {}
+
 /// Authenticatable via a related token type.
-public protocol TokenAuthenticatable: Authenticatable {
+public protocol TokenAuthenticatable: AuthenticableModel {
     /// The associated token type.
     associatedtype TokenType: Token
         where TokenType.UserType == Self
@@ -16,7 +21,7 @@ public protocol TokenAuthenticatable: Authenticatable {
     ) -> Future<Self?>
 }
 
-extension TokenAuthenticatable where Self.Database: QuerySupporting {
+extension TokenAuthenticatable where Database: QuerySupporting {
     /// See `TokenAuthenticatable.authenticate(...)`
     public static func authenticate(
         token: TokenType,

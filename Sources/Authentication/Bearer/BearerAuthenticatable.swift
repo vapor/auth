@@ -3,7 +3,7 @@ import Bits
 import Fluent
 
 /// Authenticatable by `Bearer token` auth.
-public protocol BearerAuthenticatable: Authenticatable {
+public protocol BearerAuthenticatable: Authenticatable, Model {
     /// Key path to the token
     typealias TokenKey = WritableKeyPath<Self, String>
 
