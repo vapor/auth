@@ -16,12 +16,12 @@ public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
     }
 
     /// See Middleware.respond
-    public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
-        if try request.isAuthenticated(A.self) {
-            return try next.respond(to: request)
+    public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
+        if try req.isAuthenticated(A.self) {
+            return try next.respond(to: req)
         }
-        let redirect = request.redirect(to: path)
-        return Future.map(on: request) { redirect }
+        let redirect = req.redirect(to: path)
+        return req.eventLoop.newSucceededFuture(result: redirect)
     }
 
     /// Use this middleware to redirect users away from

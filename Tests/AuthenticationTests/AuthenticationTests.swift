@@ -94,8 +94,9 @@ class AuthenticationTests: XCTestCase {
         let router = try app.make(Router.self)
 
         let group = router.grouped(
+            User.authSessionsMiddleware(),
             User.basicAuthMiddleware(using: PlaintextVerifier()),
-            User.authSessionsMiddleware()
+            User.guardAuthMiddleware()
         )
         group.get("test") { req -> String in
             let user = try req.requireAuthenticated(User.self)
@@ -130,7 +131,7 @@ class AuthenticationTests: XCTestCase {
             let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .ok)
             try XCTAssertEqual(res.http.body.consumeData(max: 100, on: app).wait(), Data("Tanner".utf8))
-            session = String(res.http.headers[.setCookie].first!.split(separator: ";").first!)
+            session = res.http.headers[.setCookie].first?.split(separator: ";").first.flatMap(String.init) ?? "n/a"
         }
 
         /// persisted req
