@@ -6,17 +6,23 @@ jobs:
       xcode: "9.3.0"
     steps:
       - checkout
+      - run:
+          name: Install LibreSSL
+          command: brew install libressl
       - run: 
           name: Compile code
           command: swift build
       - run: 
           name: Run unit tests
-          command: swift test
+          command: export ENABLE_TESTS=true; swift test
   macos-release:
     macos:
       xcode: "9.3.0"
     steps:
       - checkout
+      - run:
+          name: Install LibreSSL
+          command: brew install libressl
       - run: 
           name: Compile code with optimizations
           command: swift build -c release
@@ -30,7 +36,7 @@ jobs:
           command: swift build
       - run: 
           name: Run unit tests
-          command: swift test
+          command: export ENABLE_TESTS=true; swift test
   linux-release:
     docker:
       - image: swift:4.1
