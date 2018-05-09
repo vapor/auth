@@ -9,7 +9,7 @@ class AuthenticationTests: XCTestCase {
         let queue = MultiThreadedEventLoopGroup(numThreads: 1)
         
         let database = try SQLiteDatabase(storage: .memory)
-        let conn = try database.makeConnection(on: queue).wait()
+        let conn = try database.newConnection(on: queue).wait()
 
         try User.prepare(on: conn).wait()
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
@@ -26,7 +26,7 @@ class AuthenticationTests: XCTestCase {
         try services.register(AuthenticationProvider())
 
         let sqlite = try SQLiteDatabase(storage: .memory)
-        var databases = DatabaseConfig()
+        var databases = DatabasesConfig()
         databases.add(database: sqlite, as: .test)
         services.register(databases)
 
@@ -36,8 +36,8 @@ class AuthenticationTests: XCTestCase {
 
         let app = try Application(services: services)
 
-        let conn = try app.requestConnection(to: .test).wait()
-        defer { app.releaseConnection(conn, to: .test) }
+        let conn = try app.newConnection(to: .test).wait()
+        defer { conn.close() }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         _ = try user.save(on: conn).wait()
@@ -67,7 +67,7 @@ class AuthenticationTests: XCTestCase {
         try services.register(AuthenticationProvider())
 
         let sqlite = try SQLiteDatabase(storage: .memory)
-        var databases = DatabaseConfig()
+        var databases = DatabasesConfig()
         databases.add(database: sqlite, as: .test)
         services.register(databases)
 
@@ -78,15 +78,15 @@ class AuthenticationTests: XCTestCase {
         var middleware = MiddlewareConfig.default()
         middleware.use(SessionsMiddleware.self)
         services.register(middleware)
-        services.register(MemoryKeyedCache(on: EmbeddedEventLoop()), as: KeyedCache.self)
+        services.register(MemoryKeyedCache(), as: KeyedCache.self)
 
         var config = Config.default()
         config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
 
         let app = try Application(config: config, services: services)
 
-        let conn = try app.requestConnection(to: .test).wait()
-        defer { app.releaseConnection(conn, to: .test) }
+        let conn = try app.newConnection(to: .test).wait()
+        defer { conn.close() }
 
         let user = User(name: "Tanner", email: "tanner@vapor.codes", password: "foo")
         _ = try user.save(on: conn).wait()
@@ -94,8 +94,9 @@ class AuthenticationTests: XCTestCase {
         let router = try app.make(Router.self)
 
         let group = router.grouped(
+            User.authSessionsMiddleware(),
             User.basicAuthMiddleware(using: PlaintextVerifier()),
-            User.authSessionsMiddleware()
+            User.guardAuthMiddleware()
         )
         group.get("test") { req -> String in
             let user = try req.requireAuthenticated(User.self)
@@ -130,7 +131,7 @@ class AuthenticationTests: XCTestCase {
             let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .ok)
             try XCTAssertEqual(res.http.body.consumeData(max: 100, on: app).wait(), Data("Tanner".utf8))
-            session = String(res.http.headers[.setCookie].first!.split(separator: ";").first!)
+            session = res.http.headers[.setCookie].first?.split(separator: ";").first.flatMap(String.init) ?? "n/a"
         }
 
         /// persisted req

@@ -1,7 +1,3 @@
-import Async
-import Fluent
-import Vapor
-
 /// Protects a route group, requiring a password authenticatable
 /// instance to pass through.
 ///
@@ -19,11 +15,10 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         let responder = BasicResponder { req in
             let token = try req.requireAuthenticated(A.TokenType.self)
-            return A.authenticate(token: token, on: req).flatMap(to: Response.self) { user in
-                guard let user = user else {
-                    throw Abort(.unauthorized, reason: "Invalid credentials")
+            return A.authenticate(token: token, on: req).flatMap { user in
+                if let user = user {
+                    try req.authenticate(user)
                 }
-                try req.authenticate(user)
                 return try next.respond(to: req)
             }
         }
@@ -31,12 +26,10 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
     }
 }
 
-extension TokenAuthenticatable {
+extension TokenAuthenticatable where Self: Model {
     /// Creates a basic auth middleware for this model.
     /// See `BasicAuthenticationMiddleware`.
-    public static func tokenAuthMiddleware(
-        database: DatabaseIdentifier<Database>? = nil
-    ) -> TokenAuthenticationMiddleware<Self> {
-        return .init( bearer: TokenType.bearerAuthMiddleware())
+    public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
+        return .init(bearer: TokenType.bearerAuthMiddleware())
     }
 }

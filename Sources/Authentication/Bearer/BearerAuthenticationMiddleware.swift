@@ -18,24 +18,16 @@ public final class BearerAuthenticationMiddleware<A>: Middleware where A: Bearer
         }
 
         guard let token = req.http.headers.bearerAuthorization else {
-            throw AuthenticationError(
-                identifier: "invalidCredentials",
-                reason: "Bearer authorization header required.",
-                source: .capture()
-            )
+            return try next.respond(to: req)
         }
 
         // auth user on connection
-        return A.authenticate(
-            using: token,
-            on: req
-        ).flatMap(to: Response.self) { a in
-            guard let a = a else {
-                throw Abort(.unauthorized, reason: "Invalid credentials")
+        return A.authenticate(using: token, on: req).flatMap { a in
+            if let a = a {
+                // set authed on request
+                try req.authenticate(a)
             }
 
-            // set authed on request
-            try req.authenticate(a)
             return try next.respond(to: req)
         }
     }
