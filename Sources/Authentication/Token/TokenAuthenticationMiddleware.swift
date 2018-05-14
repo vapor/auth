@@ -14,7 +14,10 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
     /// See Middleware.respond
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
         let responder = BasicResponder { req in
-            let token = try req.requireAuthenticated(A.TokenType.self)
+            guard let token = try req.authenticated(A.TokenType.self) else {
+                return try next.respond(to: req)
+            }
+			
             return A.authenticate(token: token, on: req).flatMap { user in
                 if let user = user {
                     try req.authenticate(user)
