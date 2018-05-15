@@ -24,6 +24,11 @@ public protocol Token: BearerAuthenticatable  {
     static var userIDKey: UserIDKey { get }
 }
 
+extension Model where Self: Token, Self.UserType: Model {
+    /// See `Token`.
+    public typealias UserIDType = UserType.ID
+}
+
 extension TokenAuthenticatable
     where Self: Model, Self.TokenType: Model, Self.Database: QuerySupporting, Self.TokenType.Database == Self.Database, Self.TokenType.UserIDType == Self.ID
 {
