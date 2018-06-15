@@ -22,19 +22,15 @@ public protocol BasicAuthenticatable: Authenticatable {
     static func authenticate(using basic: BasicAuthorization, verifier: PasswordVerifier, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension BasicAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+extension BasicAuthenticatable where Self: Model {
     /// See `BasicAuthenticatable.authenticate(...)`
     public static func authenticate(using basic: BasicAuthorization, verifier: PasswordVerifier, on conn: DatabaseConnectable) -> Future<Self?> {
-        do {
-            return try Self.query(on: conn).filter(usernameKey == basic.username).first().map(to: Self?.self) { user in
-                guard let user = user, try verifier.verify(basic.password, created: user.basicPassword) else {
-                    return nil
-                }
-
-                return user
+        return Self.query(on: conn).filter(usernameKey == basic.username).first().map(to: Self?.self) { user in
+            guard let user = user, try verifier.verify(basic.password, created: user.basicPassword) else {
+                return nil
             }
-        } catch {
-            return conn.eventLoop.newFailedFuture(error: error)
+
+            return user
         }
     }
 }

@@ -23,11 +23,7 @@ extension Model where Self: SessionAuthenticatable, Self.ID: LosslessStringConve
 
     /// See `SessionAuthenticatable`.
     public static func authenticate(sessionID: Self.ID, on conn: DatabaseConnectable) -> Future<Self?> {
-        do {
-            return try find(sessionID, on: conn)
-        } catch {
-            return conn.eventLoop.newFailedFuture(error: error)
-        }
+        return find(sessionID, on: conn)
     }
 }
 

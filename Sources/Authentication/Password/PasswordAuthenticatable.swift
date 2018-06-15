@@ -10,7 +10,7 @@ public protocol PasswordAuthenticatable: BasicAuthenticatable {
     static func authenticate(username: String, password: String, using verifier: PasswordVerifier, on conn: DatabaseConnectable) -> Future<Self?>
 }
 
-extension PasswordAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+extension PasswordAuthenticatable where Self: Model {
     /// See `PasswordAuthenticatable`
     public static func authenticate(username: String, password: String, using verifier: PasswordVerifier, on conn: DatabaseConnectable ) -> Future<Self?> {
         return authenticate(
