@@ -14,14 +14,10 @@ public protocol BearerAuthenticatable: Authenticatable {
     static func authenticate(using bearer: BearerAuthorization, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension BearerAuthenticatable where Self: Model, Self.Database: QuerySupporting {
+extension BearerAuthenticatable where Self: Model {
     /// See `BearerAuthenticatable`.
     public static func authenticate(using bearer: BearerAuthorization, on conn: DatabaseConnectable) -> Future<Self?> {
-        do {
-            return try Self.query(on: conn).filter(tokenKey == bearer.token).first()
-        } catch {
-            return conn.eventLoop.newFailedFuture(error: error)
-        }
+        return Self.query(on: conn).filter(tokenKey == bearer.token).first()
     }
 }
 
