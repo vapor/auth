@@ -6,7 +6,7 @@ import XCTest
 
 class AuthenticationTests: XCTestCase {
     func testPassword() throws {
-        let queue = MultiThreadedEventLoopGroup(numThreads: 1)
+        let queue = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         
         let database = try SQLiteDatabase(storage: .memory)
         let conn = try database.newConnection(on: queue).wait()
