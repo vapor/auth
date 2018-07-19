@@ -20,6 +20,7 @@ public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
         if try req.isAuthenticated(A.self) {
             return try next.respond(to: req)
         }
+        try req.session()["goto"] = req.http.urlString
         let redirect = req.redirect(to: path)
         return req.eventLoop.newSucceededFuture(result: redirect)
     }
