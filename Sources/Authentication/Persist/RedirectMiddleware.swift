@@ -1,8 +1,5 @@
-import Vapor
-
 /// Basic middleware to redirect unauthenticated requests to the supplied path
 public struct RedirectMiddleware<A>: Middleware where A: Authenticatable {
-
     /// The path to redirect to
     let path: String
 

@@ -6,7 +6,7 @@ public struct BasicAuthorization {
     /// The plaintext password
     public let password: String
 
-    /// Create a new Password
+    /// Create a new `BasicAuthorization`.
     public init(username: String, password: String) {
         self.username = username
         self.password = password

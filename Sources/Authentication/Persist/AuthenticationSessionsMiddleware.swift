@@ -1,8 +1,4 @@
-import Fluent
-import Vapor
-
-/// Persists authentication done by another auth middleware
-/// allowing the authentication to only be passed once.
+/// Persists authentication done by another auth middleware allowing the authentication to only be passed once.
 public final class AuthenticationSessionsMiddleware<A>: Middleware where A: SessionAuthenticatable {
     /// create a new password auth middleware
     public init(authenticatable type: A.Type = A.self) { }

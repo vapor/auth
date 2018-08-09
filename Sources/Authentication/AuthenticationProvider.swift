@@ -1,16 +1,9 @@
-import Async
-import Crypto
-import Service
-
 /// Adds authentication services to a container
 public final class AuthenticationProvider: Provider {
-    /// See Provider.repositoryName
-    public static var repositoryName: String = "auth"
-
-    /// Create a new authentication provider
+    /// Create a new `AuthenticationProvider`.
     public init() { }
 
-    /// See Provider.register
+    /// See `Provider`.
     public func register(_ services: inout Services) throws {
         services.register(PasswordVerifier.self) { container in
             return BCryptDigest()

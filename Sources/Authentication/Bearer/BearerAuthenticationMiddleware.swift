@@ -1,6 +1,3 @@
-import Fluent
-import Vapor
-
 /// Protects a route group, requiring a token authenticatable
 /// instance to pass through.
 ///
