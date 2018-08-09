@@ -23,7 +23,7 @@ public protocol BasicAuthenticatable: Authenticatable {
 }
 
 extension BasicAuthenticatable where Self: Model {
-    /// See `BasicAuthenticatable.authenticate(...)`
+    /// See `BasicAuthenticatable`.
     public static func authenticate(using basic: BasicAuthorization, verifier: PasswordVerifier, on conn: DatabaseConnectable) -> Future<Self?> {
         return Self.query(on: conn).filter(usernameKey == basic.username).first().map(to: Self?.self) { user in
             guard let user = user, try verifier.verify(basic.password, created: user.basicPassword) else {

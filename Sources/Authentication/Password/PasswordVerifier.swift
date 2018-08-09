@@ -1,6 +1,3 @@
-import Foundation
-import Service
-
 /// Capable of verifying that a supplied password matches a hash.
 public protocol PasswordVerifier {
     /// Verifies that the supplied password matches a given hash.

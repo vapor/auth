@@ -1,8 +1,3 @@
-import Async
-import Fluent
-import Service
-import Vapor
-
 /// Authenticatable using a username and password.
 public protocol PasswordAuthenticatable: BasicAuthenticatable {
     /// Authenticates using a username and password using the supplied

@@ -1,5 +1,3 @@
-import Vapor
-
 /// Stores authenticated objects. This should be created
 /// using the request container as a singleton. Authenticated
 /// objects can then be stored here by middleware and fetched

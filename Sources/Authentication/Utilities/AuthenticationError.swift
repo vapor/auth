@@ -1,5 +1,4 @@
 import Debugging
-import Vapor
 
 /// Errors that can be thrown while working with Authentication.
 public struct AuthenticationError: Debuggable {

@@ -1,7 +1,3 @@
-import Bits
-import Crypto
-import HTTP
-
 extension HTTPHeaders {
     /// Access or set the `Authorization: Bearer: ...` header.
     public var bearerAuthorization: BearerAuthorization? {
