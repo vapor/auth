@@ -26,9 +26,13 @@ public final class AuthenticationSessionsMiddleware<A>: Middleware where A: Sess
         return future.flatMap {
             // respond to the request
             return try next.respond(to: req).map { res in
-                // if a user is authed, store in the session
                 if let a = try req.authenticated(A.self) {
+                    // if a user has been authed (or is still authed), store in the session
                     try req.authenticateSession(a)
+                } else {
+                    // if no user is authed, it's possible they've been unauthed.
+                    // remove from session.
+                    try req.unauthenticateSession(A.self)
                 }
                 return res
             }
