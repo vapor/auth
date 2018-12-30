@@ -1,4 +1,4 @@
-/// Protects a route group, requiring a password authenticatable
+/// Protects a route group, requiring a token authenticatable
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
@@ -30,8 +30,8 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
 }
 
 extension TokenAuthenticatable where Self: Model {
-    /// Creates a basic auth middleware for this model.
-    /// See `BasicAuthenticationMiddleware`.
+    /// Creates a token auth middleware for this model.
+    /// See `TokenAuthenticationMiddleware`.
     public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
         return .init(bearer: TokenType.bearerAuthMiddleware())
     }

@@ -31,8 +31,8 @@ public final class BearerAuthenticationMiddleware<A>: Middleware where A: Bearer
 }
 
 extension BearerAuthenticatable {
-    /// Creates a basic auth middleware for this model.
-    /// See `BasicAuthenticationMiddleware`.
+    /// Creates a bearer auth middleware for this model.
+    /// See `BearerAuthenticationMiddleware`.
     public static func bearerAuthMiddleware() -> BearerAuthenticationMiddleware<Self> {
         return BearerAuthenticationMiddleware()
     }
