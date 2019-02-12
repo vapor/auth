@@ -73,15 +73,20 @@ class AuthenticationTests: XCTestCase {
 
         var migrations = MigrationConfig()
         migrations.add(model: User.self, database: .test)
+        migrations.prepareCache(for: .test)
         services.register(migrations)
 
         var middleware = MiddlewareConfig.default()
         middleware.use(SessionsMiddleware.self)
         services.register(middleware)
-        services.register(MemoryKeyedCache(), as: KeyedCache.self)
+        
+        services.register(KeyedCache.self) { container -> SQLiteCache in
+            let pool = try container.connectionPool(to: .test)
+            return .init(pool: pool)
+        }
 
         var config = Config.default()
-        config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+        config.prefer(SQLiteCache.self, for: KeyedCache.self)
 
         let app = try Application(config: config, services: services)
 
@@ -104,7 +109,8 @@ class AuthenticationTests: XCTestCase {
         }
 
         group.get("logout") { req -> HTTPStatus in
-            try req.unauthenticateSession(User.self)
+            try req.destroySession()
+            try req.unauthenticate(User.self)
             return .ok
         }
 
@@ -166,6 +172,15 @@ class AuthenticationTests: XCTestCase {
 
             let res = try responder.respond(to: req).wait()
             XCTAssertEqual(res.http.status, .ok)
+        }
+        
+        // ensure the session has been removed from storage
+        do {
+            let conn = try sqlite.newConnection(on: app.eventLoop).wait()
+            try conn.raw("SELECT COUNT(*) as count FROM fluentcache").run { row in
+                let count = row.firstValue(forColumn: "count")!.description
+                XCTAssertEqual(count, "0")
+            }.wait()
         }
 
         /// logged-out persisted req
