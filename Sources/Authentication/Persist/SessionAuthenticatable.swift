@@ -41,6 +41,9 @@ extension Request {
 
     /// Un-authenticates the model from the session.
     public func unauthenticateSession<A>(_ a: A.Type) throws where A: SessionAuthenticatable {
+        guard try self.hasSession() else {
+            return
+        }
         try session()["_" + A.sessionName + "Session"] = nil
         try unauthenticate(A.self)
     }
