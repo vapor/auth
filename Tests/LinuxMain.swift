@@ -1,6 +1,8 @@
 import XCTest
-@testable import AuthenticationTests
 
-XCTMain([
-    testCase(AuthenticationTests.allTests),
-])
+import AuthenticationTests
+
+var tests = [XCTestCaseEntry]()
+tests += AuthenticationTests.__allTests()
+
+XCTMain(tests)
