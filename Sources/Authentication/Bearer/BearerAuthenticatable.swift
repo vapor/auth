@@ -2,13 +2,17 @@ import Async
 import Bits
 import Fluent
 
-extension BearerAuthorization: HeaderAuthorization {}
+extension BearerAuthorization: HeaderValueAuthorization {}
 
 /// Authenticatable by `Bearer token` auth.
-public protocol BearerAuthenticatable: HeaderAuthenticatable where AuthorizationType == BearerAuthorization {
+public protocol BearerAuthenticatable: HeaderValueAuthenticatable where AuthorizationType == BearerAuthorization {
 }
 
-extension HeaderAuthenticatable where AuthorizationType == BearerAuthorization {
+// This extension captures both things explicitly declared to be
+// BearerAuthenticatable and also things declared to be
+// HeaderValueAuthenticatable with an AuthorizationType of
+// BearerAuthorization.
+extension HeaderValueAuthenticatable where AuthorizationType == BearerAuthorization {
     /// Accesses the model's token
     public var bearerToken: String {
         get { return authToken }

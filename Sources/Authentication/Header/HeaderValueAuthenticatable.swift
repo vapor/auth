@@ -1,13 +1,13 @@
 
 /// Authenticatable by a value found
 /// in one of the HTTP headers.
-public protocol HeaderAuthenticatable: Authenticatable {
+public protocol HeaderValueAuthenticatable: Authenticatable {
 	/// The type of authorization being used.
 	/// Most commonly this is BearerAuthorization
 	/// but ValueAuthorization can be used if you are
 	/// authenticating with a value not found in the
 	/// Authorization: Bearer header.
-	associatedtype AuthorizationType: HeaderAuthorization
+	associatedtype AuthorizationType: HeaderValueAuthorization
 
 	/// Key path to the token
 	typealias TokenKey = WritableKeyPath<Self, String>
@@ -24,14 +24,14 @@ public protocol HeaderAuthenticatable: Authenticatable {
 	static func authenticate(using auth: AuthorizationType, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
-extension HeaderAuthenticatable where Self: Model {
+extension HeaderValueAuthenticatable where Self: Model {
 	/// See `HeaderAuthenticatable`.
 	public static func authenticate(using auth: AuthorizationType, on conn: DatabaseConnectable) -> Future<Self?> {
 		return Self.query(on: conn).filter(tokenKey == auth.token).first()
 	}
 }
 
-extension HeaderAuthenticatable {
+extension HeaderValueAuthenticatable {
 	/// Accesses the model's token
 	public var authToken: String {
 		get { return self[keyPath: Self.tokenKey] }

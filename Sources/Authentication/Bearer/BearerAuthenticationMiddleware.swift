@@ -3,7 +3,7 @@
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public final class BearerAuthenticationMiddleware<A>: HeaderAuthenticationMiddleware<A> where A: BearerAuthenticatable {}
+public final class BearerAuthenticationMiddleware<A>: HeaderValueAuthenticationMiddleware<A> where A: BearerAuthenticatable {}
 
 extension BearerAuthenticatable {
 	/// Creates a bearer auth middleware for this model.

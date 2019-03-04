@@ -3,7 +3,7 @@
 /// instance to pass through.
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
-public class HeaderAuthenticationMiddleware<A>: Middleware where A: HeaderAuthenticatable {
+public class HeaderValueAuthenticationMiddleware<A>: Middleware where A: HeaderValueAuthenticatable {
 	/// Creates a new `HeaderAuthenticationMiddleware`.
 	public init(_ type: A.Type = A.self) {}
 
@@ -31,10 +31,10 @@ public class HeaderAuthenticationMiddleware<A>: Middleware where A: HeaderAuthen
 	}
 }
 
-extension HeaderAuthenticatable {
+extension HeaderValueAuthenticatable {
 	/// Creates a header auth middleware for this model.
-	/// See `HeaderAuthenticationMiddleware`.
-	public static func headerAuthMiddleware() -> HeaderAuthenticationMiddleware<Self> {
-		return HeaderAuthenticationMiddleware()
+	/// See `HeaderValueAuthenticationMiddleware`.
+	public static func headerAuthMiddleware() -> HeaderValueAuthenticationMiddleware<Self> {
+		return HeaderValueAuthenticationMiddleware()
 	}
 }

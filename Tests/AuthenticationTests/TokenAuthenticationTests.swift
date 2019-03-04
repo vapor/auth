@@ -14,7 +14,7 @@ class TokenAuthenticationTests: XCTestCase {
 	func test_HeaderAuthUser_resultsInHeaderAuthMiddleware() {
 		let middleware = HeaderTokenAuthUser.tokenAuthMiddleware()
 
-		XCTAssert(type(of: middleware.headerAuthMiddleware).self == HeaderAuthenticationMiddleware<HeaderAuthToken>.self)
+		XCTAssert(type(of: middleware.headerAuthMiddleware).self == HeaderValueAuthenticationMiddleware<HeaderAuthToken>.self)
 	}
 
 	func test_BearerAuthUser_resultsInBearerAuthMiddleware() {
@@ -70,12 +70,12 @@ private struct HeaderTokenAuthUser: Model, TokenAuthenticatable {
 }
 
 private struct HeaderAuthToken: Model, Token {
-	static func authorization(from headers: HTTPHeaders) -> ValueAuthorization? {
-		return headers[.sessionToken].first.map(ValueAuthorization.init(token:))
+	static func authorization(from headers: HTTPHeaders) -> BasicHeaderValueAuthorization? {
+		return headers[.sessionToken].first.map(BasicHeaderValueAuthorization.init(token:))
 	}
 
 	typealias UserType = HeaderTokenAuthUser
-	typealias AuthorizationType = ValueAuthorization
+	typealias AuthorizationType = BasicHeaderValueAuthorization
 	typealias Database = SQLiteDatabase
 	typealias ID = UUID
 

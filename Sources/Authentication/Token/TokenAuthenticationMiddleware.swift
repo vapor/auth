@@ -4,10 +4,10 @@
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
 public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAuthenticatable {
     /// The underlying header auth middleware.
-    public let headerAuthMiddleware: HeaderAuthenticationMiddleware<A.TokenType>
+    public let headerAuthMiddleware: HeaderValueAuthenticationMiddleware<A.TokenType>
 
     /// Create a new `TokenAuthenticationMiddleware`
-    public init(headerAuthMiddleware: HeaderAuthenticationMiddleware<A.TokenType>) {
+    public init(headerAuthMiddleware: HeaderValueAuthenticationMiddleware<A.TokenType>) {
         self.headerAuthMiddleware = headerAuthMiddleware
     }
 
