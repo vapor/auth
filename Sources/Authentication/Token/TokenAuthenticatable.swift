@@ -10,7 +10,7 @@ public protocol TokenAuthenticatable: Authenticatable {
 
 /// A token, related to a user, capable of being used with Bearer auth.
 /// See `TokenAuthenticatable`.
-public protocol Token: BearerAuthenticatable  {
+public protocol Token: HeaderAuthenticatable  {
     /// The User type that owns this token.
     associatedtype UserType
 
