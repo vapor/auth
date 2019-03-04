@@ -17,7 +17,7 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
             guard let token = try req.authenticated(A.TokenType.self) else {
                 return try next.respond(to: req)
             }
-			
+
             return A.authenticate(token: token, on: req).flatMap { user in
                 if let user = user {
                     try req.authenticate(user)
@@ -30,17 +30,17 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
 }
 
 extension TokenAuthenticatable where Self: Model {
-	/// Creates a token auth middleware for this model.
-	/// See `TokenAuthenticationMiddleware`.
-	public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
-		return .init(headerAuthMiddleware: TokenType.headerAuthMiddleware())
-	}
+    /// Creates a token auth middleware for this model.
+    /// See `TokenAuthenticationMiddleware`.
+    public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
+        return .init(headerAuthMiddleware: TokenType.headerAuthMiddleware())
+    }
 }
 
 extension TokenAuthenticatable where Self: Model, TokenType: BearerAuthenticatable {
     /// Creates a token auth middleware for this model.
     /// See `TokenAuthenticationMiddleware`.
-	public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
+    public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
         return .init(headerAuthMiddleware: TokenType.bearerAuthMiddleware())
     }
 }

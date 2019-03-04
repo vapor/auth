@@ -19,9 +19,9 @@ extension HeaderValueAuthenticatable where AuthorizationType == BearerAuthorizat
         set { authToken = newValue }
     }
 
-	/// See `HeaderAuthenticatable`
-	/// Pulls an authorization token out of the headers.
-	public static func authorization(from headers: HTTPHeaders) -> AuthorizationType? {
-		return headers.bearerAuthorization
-	}
+    /// See `HeaderAuthenticatable`
+    /// Pulls an authorization token out of the headers.
+    public static func authorization(from headers: HTTPHeaders) -> AuthorizationType? {
+        return headers.bearerAuthorization
+    }
 }

@@ -1,6 +1,6 @@
 
 public protocol HeaderValueAuthorization {
-	var token: String { get }
+    var token: String { get }
 
-	init(token: String)
+    init(token: String)
 }
