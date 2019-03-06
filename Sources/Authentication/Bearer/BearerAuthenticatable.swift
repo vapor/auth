@@ -8,11 +8,7 @@ extension BearerAuthorization: HeaderValueAuthorization {}
 public protocol BearerAuthenticatable: HeaderValueAuthenticatable where AuthorizationValue == BearerAuthorization {
 }
 
-// This extension captures both things explicitly declared to be
-// BearerAuthenticatable and also things declared to be
-// HeaderValueAuthenticatable with an AuthorizationType of
-// BearerAuthorization.
-extension HeaderValueAuthenticatable where AuthorizationValue == BearerAuthorization {
+extension BearerAuthenticatable {
     /// Accesses the model's token
     public var bearerToken: String {
         get { return authToken }
