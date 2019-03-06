@@ -69,7 +69,7 @@ private struct HeaderAuthToken: Model, Token {
     }
 
     typealias UserType = HeaderTokenAuthUser
-    typealias AuthorizationType = BasicHeaderValueAuthorization
+    typealias AuthorizationValue = BasicHeaderValueAuthorization
     typealias Database = SQLiteDatabase
     typealias ID = UUID
 
