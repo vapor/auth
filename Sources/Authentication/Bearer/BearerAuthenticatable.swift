@@ -2,11 +2,8 @@ import Async
 import Bits
 import Fluent
 
-extension BearerAuthorization: HeaderValueAuthorization {}
-
 /// Authenticatable by `Bearer token` auth.
-public protocol BearerAuthenticatable: HeaderValueAuthenticatable where AuthorizationValue == BearerAuthorization {
-}
+public protocol BearerAuthenticatable: HeaderValueAuthenticatable {}
 
 extension BearerAuthenticatable {
     /// Accesses the model's token
@@ -17,7 +14,7 @@ extension BearerAuthenticatable {
 
     /// See `HeaderAuthenticatable`
     /// Pulls an authorization token out of the headers.
-    public static func authorization(from headers: HTTPHeaders) -> AuthorizationValue? {
-        return headers.bearerAuthorization
+    public static func authToken(from headers: HTTPHeaders) -> String? {
+        return headers.bearerAuthorization?.token
     }
 }

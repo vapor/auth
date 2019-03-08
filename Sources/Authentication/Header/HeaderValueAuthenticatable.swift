@@ -2,13 +2,6 @@
 /// Authenticatable by a value found
 /// in one of the HTTP headers.
 public protocol HeaderValueAuthenticatable: Authenticatable {
-    /// The type of authorization being used.
-    /// Most commonly this is BearerAuthorization
-    /// but BasicHeaderValueAuthorization can be used
-    /// if you are authenticating with a value not
-    /// found in the Authorization: Bearer header.
-    associatedtype AuthorizationValue: HeaderValueAuthorization
-
     /// Key path to the token
     typealias TokenKey = WritableKeyPath<Self, String>
 
@@ -18,16 +11,16 @@ public protocol HeaderValueAuthenticatable: Authenticatable {
     /// Attempt to retrieve an authorization value from
     /// the given headers.
     ///	- parameter headers:
-    static func authorization(from headers: HTTPHeaders) -> AuthorizationValue?
+    static func authToken(from headers: HTTPHeaders) -> String?
 
     /// Authenticates using the supplied credentials and connection.
-    static func authenticate(using auth: AuthorizationValue, on connection: DatabaseConnectable) -> Future<Self?>
+    static func authenticate(using authToken: String, on connection: DatabaseConnectable) -> Future<Self?>
 }
 
 extension HeaderValueAuthenticatable where Self: Model {
     /// See `HeaderAuthenticatable`.
-    public static func authenticate(using auth: AuthorizationValue, on conn: DatabaseConnectable) -> Future<Self?> {
-        return Self.query(on: conn).filter(tokenKey == auth.token).first()
+    public static func authenticate(using authToken: String, on conn: DatabaseConnectable) -> Future<Self?> {
+        return Self.query(on: conn).filter(tokenKey == authToken).first()
     }
 }
 

@@ -15,7 +15,7 @@ public class HeaderValueAuthenticationMiddleware<A>: Middleware where A: HeaderV
             return try next.respond(to: req)
         }
 
-        guard let token = A.authorization(from: req.http.headers) else {
+        guard let token = A.authToken(from: req.http.headers) else {
             return try next.respond(to: req)
         }
 

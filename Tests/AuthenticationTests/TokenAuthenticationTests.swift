@@ -23,10 +23,10 @@ class TokenAuthenticationTests: XCTestCase {
 
         headers.add(name: .sessionToken, value: testToken)
 
-        XCTAssertEqual(HeaderAuthToken.authorization(from: headers)?.token, testToken)
+        XCTAssertEqual(HeaderAuthToken.authToken(from: headers), testToken)
 
         // sanity check test
-        XCTAssertNil(BearerAuthToken.authorization(from: headers)?.token)
+        XCTAssertNil(BearerAuthToken.authToken(from: headers))
     }
 
     func test_BearerAuthExtractsSessionToken() {
@@ -35,10 +35,10 @@ class TokenAuthenticationTests: XCTestCase {
 
         headers.bearerAuthorization = BearerAuthorization(token: testToken)
 
-        XCTAssertEqual(BearerAuthToken.authorization(from: headers)?.token, testToken)
+        XCTAssertEqual(BearerAuthToken.authToken(from: headers), testToken)
 
         // sanity check test
-        XCTAssertNil(HeaderAuthToken.authorization(from: headers)?.token)
+        XCTAssertNil(HeaderAuthToken.authToken(from: headers))
     }
 
 }
@@ -64,12 +64,12 @@ private struct HeaderTokenAuthUser: Model, TokenAuthenticatable {
 }
 
 private struct HeaderAuthToken: Model, Token {
-    static func authorization(from headers: HTTPHeaders) -> BasicHeaderValueAuthorization? {
-        return headers[.sessionToken].first.map(BasicHeaderValueAuthorization.init(token:))
+    static func authToken(from headers: HTTPHeaders) -> String? {
+        return headers[.sessionToken]
+            .first
     }
 
     typealias UserType = HeaderTokenAuthUser
-    typealias AuthorizationValue = BasicHeaderValueAuthorization
     typealias Database = SQLiteDatabase
     typealias ID = UUID
 
