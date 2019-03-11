@@ -3,12 +3,12 @@
 ///
 /// use `req.requireAuthenticated(A.self)` to fetch the instance.
 public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAuthenticatable {
-    /// The underlying bearer auth middleware.
-    public let bearer: BearerAuthenticationMiddleware<A.TokenType>
+    /// The underlying header auth middleware.
+    public let headerAuthMiddleware: HeaderValueAuthenticationMiddleware<A.TokenType>
 
     /// Create a new `TokenAuthenticationMiddleware`
-    public init(bearer: BearerAuthenticationMiddleware<A.TokenType>) {
-        self.bearer = bearer
+    public init(headerAuthMiddleware: HeaderValueAuthenticationMiddleware<A.TokenType>) {
+        self.headerAuthMiddleware = headerAuthMiddleware
     }
 
     /// See Middleware.respond
@@ -17,7 +17,7 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
             guard let token = try req.authenticated(A.TokenType.self) else {
                 return try next.respond(to: req)
             }
-			
+
             return A.authenticate(token: token, on: req).flatMap { user in
                 if let user = user {
                     try req.authenticate(user)
@@ -25,7 +25,7 @@ public final class TokenAuthenticationMiddleware<A>: Middleware where A: TokenAu
                 return try next.respond(to: req)
             }
         }
-        return try bearer.respond(to: req, chainingTo: responder)
+        return try headerAuthMiddleware.respond(to: req, chainingTo: responder)
     }
 }
 
@@ -33,6 +33,14 @@ extension TokenAuthenticatable where Self: Model {
     /// Creates a token auth middleware for this model.
     /// See `TokenAuthenticationMiddleware`.
     public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
-        return .init(bearer: TokenType.bearerAuthMiddleware())
+        return .init(headerAuthMiddleware: TokenType.headerAuthMiddleware())
+    }
+}
+
+extension TokenAuthenticatable where Self: Model, TokenType: BearerAuthenticatable {
+    /// Creates a token auth middleware for this model.
+    /// See `TokenAuthenticationMiddleware`.
+    public static func tokenAuthMiddleware(database: DatabaseIdentifier<Database>? = nil) -> TokenAuthenticationMiddleware<Self> {
+        return .init(headerAuthMiddleware: TokenType.bearerAuthMiddleware())
     }
 }
