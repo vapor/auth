@@ -1,36 +1,22 @@
-// swift-tools-version:4.0
+// swift-tools-version:5.0
 import PackageDescription
-import Foundation
 
 let package = Package(
-    name: "Auth",
+    name: "auth",
     products: [
         .library(name: "Authentication", targets: ["Authentication"]),
     ],
     dependencies: [
-        // 🌎 Utility package containing tools for byte manipulation, Codable, OS APIs, and debugging.
-        .package(url: "https://github.com/vapor/core.git", from: "3.0.0"),
-        
         // 🔑 Hashing (BCrypt, SHA, HMAC, etc), encryption, and randomness.
-        .package(url: "https://github.com/vapor/crypto.git", from: "3.0.0"),
-
-        // 🚀 Non-blocking, event-driven networking for Swift (HTTP and WebSockets).
-        .package(url: "https://github.com/vapor/http.git", from: "3.1.0"),
-
-        // 🖋 Swift ORM framework (queries, models, and relations) for building NoSQL and SQL database integrations.
-        .package(url: "https://github.com/vapor/fluent.git", from: "3.0.0-"),
-
-        // 📦 Dependency injection / inversion of control framework.
-        .package(url: "https://github.com/vapor/service.git", from: "1.0.0"),
-
-        // 💧 A server-side Swift web framework.
-        .package(url: "https://github.com/vapor/vapor.git", from: "3.2.0"),
+        .package(url: "https://github.com/vapor/crypto.git", .branch("master")),
         
-        // Fluent SQLite, only for testing.
-        .package(url: "https://github.com/vapor/fluent-sqlite.git", from: "3.0.0"),
+        // 🖋 Swift ORM framework (queries, models, and relations) for building NoSQL and SQL database integrations.
+        .package(url: "https://github.com/vapor/fluent.git", .branch("master")),
+        // 💧 A server-side Swift web framework.
+        .package(url: "https://github.com/vapor/vapor.git", .branch("master")),
     ],
     targets: [
-        .target(name: "Authentication", dependencies: ["Async", "Bits", "Crypto", "Debugging", "Fluent", "HTTP", "Service", "Vapor"]),
-        .testTarget(name: "AuthenticationTests", dependencies: ["Authentication", "FluentSQLite", "Vapor"]),
+        .target(name: "Authentication", dependencies: ["Fluent", "Vapor"]),
+        .testTarget(name: "AuthenticationTests", dependencies: ["Authentication", "Vapor"]),
     ]
 )
