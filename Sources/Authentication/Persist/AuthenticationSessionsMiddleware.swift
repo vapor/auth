@@ -5,6 +5,12 @@ public final class AuthenticationSessionsMiddleware<A>: Middleware where A: Sess
 
     /// See Middleware.respond
     public func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
+        // if the user has already been authenticated
+        // by a previous middleware, continue
+        if try req.isAuthenticated(A.self) {
+            return try next.respond(to: req)
+        }
+        
         let future: Future<Void>
         if let aID = try req.authenticatedSession(A.self) {
             // try to find user with id from session
