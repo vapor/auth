@@ -19,4 +19,4 @@
     </a>
 </p>
 
-Note: the Auth package is built in to Vapor 4. This package is for version 3, and is not necessary in future versions.
+Note: the Auth package is built-in to Vapor 4. This package is for version 3, and is not necessary in future versions.
