@@ -18,3 +18,5 @@
         <img src="http://img.shields.io/badge/swift-4.1-brightgreen.svg" alt="Swift 4.1">
     </a>
 </p>
+
+Note: the Auth package is built in to Vapor 4. This package is for version 3, and is not necessary in future versions.
